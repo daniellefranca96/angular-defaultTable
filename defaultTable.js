@@ -28,9 +28,7 @@ angular.module('defaultTable').controller("defaultTableCtrl", function($scope, $
 	  var token = $scope.token;
 	  var urlList 	= $scope.urlList;
 	  var lista = lista;
-	  
-	  $scope.linhas 	= [];
-	  
+
 	  $scope.filterDataTable =  function (orderBy, modelFilter, limit, offset, evento){
 		  
 			if(evento.type == "click")
@@ -99,52 +97,7 @@ angular.module('defaultTable').controller("defaultTableCtrl", function($scope, $
     	$scope.redirecionar = function(url){
 			window.location.href = url;
 		};
-		
-		
-		$scope.deletar = function(lista, linhas){
-				var selected = [];
-				
-				if(linhas != {})
-					for (var i in linhas)
-						selected.push(parseInt(i));
-				
-				if(selected.length > 0){
-					ajaxAPI.deleteAll(selected, token, urlList+"/delete-all", function(response){
-						
-						if(response.data.success){
-							lista = lista.filter(function(obj){
-								if(selected.indexOf(obj.id) == -1) return obj;
-							});
-							
-							$$scope.lista = lista;
-							
-						} else {
-							message.classe = "alert alert-danger";
-							message.title = "Erro!"
-							message.message = "Erro ao deletar!";
-							message.show 	= true;
-						}
-						
-						
-					}, function(response){
-						console.log(response.data.error);
-						message.classe = "alert alert-danger";
-						message.title = "Erro!"
-						message.message = "Erro na requisição!";
-						message.show 	= true;
-					});
-				}	
-			};
 
-			$scope.nullCamp = function(value = null){
-				if(value == 0 || value.length == 0)
-					return true;
-				return false;
-			};
-			
-			this.setLista = function(lista){
-				lista = lista;
-			}
 });
 
 angular.module('defaultTable').directive('defaultTable', function(){
@@ -174,8 +127,22 @@ angular.module('defaultTable').directive('defaultTable', function(){
 		      },
 		      controller: "defaultTableCtrl",
 		      link: function(scope, element, attrs, ctrl){
-		    	
-		    	  scope.getColumns = function(columnCheckbox, columnAction, columns){
+
+
+                  scope.getTdColumn = function(v, c){
+
+                     	 var value = c.null ? c.null :  "-";
+
+						  if(c.expression)
+                              value = eval(c.expression.replace("{value}", v));
+						  else if(v)
+                              value = v;
+
+                      return value;
+
+				  };
+
+		    	  scope.getColumnsTotal = function(columnCheckbox, columnAction, columns){
 		    		  var checkbox 	= scope.columnCheckbox 	? 1 : 0;
 		    		  var action	= scope.columnAction 	? 1 : 0;
 		    		  return columns+action+checkbox;
@@ -183,7 +150,6 @@ angular.module('defaultTable').directive('defaultTable', function(){
 		    	  
 		    	  scope.columnActionSwitch = "url";
 		    	  scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
-		    	  ctrl.setLista(scope.lista);
 		    	  
 		      },
 		    };
@@ -195,7 +161,7 @@ angular.module('defaultTable').directive('defaultTableActionButton', function(){
 		transclude: true,
 		replace: true,
 		require: '^defaultTable',
-		template: '<li><a ng-click="url ? redirecionar(url) : (customDelete ? deletar() : action)"><i class="{:icone:}"></i>{:label:}</a></li>',
+		template: '<li><a ng-click="url ? redirecionar(url) : action({linhas:getLinhas()})"><i class="{:icone:}"></i>{:label:}{:getLinhas():}</a></li>',
 		scope: {
 			action: 		"&defaultTableActionButtonMethod",
 			url: 			"@defaultTableActionButtonUrl",
@@ -205,42 +171,11 @@ angular.module('defaultTable').directive('defaultTableActionButton', function(){
 		},
 		controller: "defaultTableCtrl",
 		link:	function(scope, element, attrs, ctrl){
-			console.log(ctrl.lista);
+
 		}
 	}
 });
-//	angular.module('defaultTable').directive('defaultTableColumnThFilter', function(){
-//		return {
-//			restrict: 'EA',
-//			require: '^defaultTable',
-//			transclude: true,
-//			replace: true,
-//			template: 		'<th style="{:style:}">'+
-//							'<input type="text" class="form-control" ng-model="modelFilter[id]" ng-if="type==\'input\'" ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event)">'+
-//							'<select class="form-control" ng-model="modelFilter[id]" ng-if="type==\'select\'" ng-options="v.id as v.descricao in values" ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event)">'+
-//							'</th>',
-//			scope: {
-//				style: "=defaultTableColumnThFilterStyle",
-//				id: "=defaultTableColumnThFilterId",
-//				type: "@defaultTableColumnThFilterType",
-//				values: "=defaultTableColumnThFilterValues",
-//			},
-//		}
-//	});
-//	angular.module('defaultTable').directive('defaultTableColumnTh', function(){
-//		return {
-//			restrict: 'EA',
-//			transclude: true,
-//			require: '^defaultTable',
-//			template: '<th style="{:style:}" ng-transclude></th>',
-//			scope: {
-//				style: "=defaultTableColumnThFilterStyle",
-//				id: "=defaultTableColumnThFilterId",
-//				type: "@defaultTableColumnThFilterType",
-//				values: "=defaultTableColumnThFilterValues",
-//			},
-//		}
-//	});
+
 	
 	
 	

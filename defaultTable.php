@@ -29,15 +29,17 @@
 		<tr>
 			<th width="5%" ng-if="columnCheckbox"></th>
 			<th ng-repeat="t in columns">
-				<input type="text" class="form-control" ng-model="modelFilter[t.id]"  ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event)">
-			</th>
+				<input ng-if="(t.filter == undefined || t.filter !== false) && (!t.filterType || t.filterType === 'input')" type="text" class="form-control" ng-model="modelFilter[t.id]"  ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event)">
+                    <select ng-if="t.filterType === 'select'" ng-options="x.id as x.descricao for x in t.filterOptions" class="form-control" ng-model="modelFilter[t.id]"  ng-change="filterDataTable(orderBy, modelFilter, limit, offset,  {type:'keyup'})">
+                    </select>
+            </th>
 			<th ng-if="columnAction"></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr ng-repeat="l in lista track by $index">
-			<td ng-if="columnCheckbox"><input type="checkbox" ng-model="linhas[l[columnCheckboxId]]"></td>
-			<td ng-repeat="c in columns">{:(l[c.id].length != 0 && l[c.id]) ? l[c.id] : (c.null != undefined ? c.null : "-") :}</td>
+			<td ng-if="columnCheckbox"><input type="checkbox"></td>
+            <td align="{:c.tdAlign:}" ng-repeat="c in columns"><span ng-class="c.tdTextClass" ng-style="c.tdTextStyle">{:getTdColumn(l[c.id], c):}</span></td>
 			<td align="middle" width="5%">
 				<a href="{:columnActionUrl+'/'+l[columnId]:}" class="btn {:columnActionClass:}" ng-show="columnActionSwitch == 'url'">
 					{:columnActionLabel:}
@@ -48,7 +50,7 @@
 			</td>
 		</tr>
 		<tr ng-if="lista.length == 0">
-			<td colspan="{:getColumns(columnCheckbox, columnAction, columns.length):}" style="font-weight:bold;fontsize:16px;" align="middle">Não há dados cadastrados!</td>
+			<td colspan="{:getColumnsTotal(columnCheckbox, columnAction, columns.length):}" style="font-weight:bold;fontsize:16px;" align="middle">Não há dados cadastrados!</td>
 		</tr>
 	</tbody>
 </table>
