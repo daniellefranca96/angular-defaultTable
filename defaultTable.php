@@ -14,7 +14,7 @@
 	      </div> <!-- btns-group ::end::-->
 	</div>
 	<div class="col-md-2 pull-right" ng-if="selectLinePerPage && selectLinePerPageValues.length>0">
-		<select ng-model="limit" class="form-control" ng-change="filterDataTable(orderBy, modelFilter, limit, offset, {})" ng-options="x for x in selectLinePerPageValues">
+		<select ng-model="limit" class="form-control" ng-change="filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations)" ng-options="x for x in selectLinePerPageValues">
 		</select>
 	</div>
 </div>
@@ -23,14 +23,14 @@
 	<thead>
 		<tr>
 			<th width="5%" ng-if="columnCheckbox"></th>
-			<th ng-repeat="t in columns"><a id="{:t.id:}" ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event)">{:t.descricao:}</a></th>
+			<th ng-repeat="t in columns"><a id="{:t.id:}" ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations)">{:t.descricao:}</a></th>
 			<th ng-if="columnAction"></th>
 		</tr>
 		<tr>
 			<th width="5%" ng-if="columnCheckbox"></th>
 			<th ng-repeat="t in columns">
-				<input ng-if="(t.filter == undefined || t.filter !== false) && (!t.filterType || t.filterType === 'input')" type="text" class="form-control" ng-model="modelFilter[t.id]"  ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event)">
-                    <select ng-if="t.filterType === 'select'" ng-options="x.id as x.descricao for x in t.filterOptions" class="form-control" ng-model="modelFilter[t.id]"  ng-change="filterDataTable(orderBy, modelFilter, limit, offset,  {type:'keyup'})">
+				<input ng-if="(t.filter == undefined || t.filter !== false) && (!t.filterType || t.filterType === 'input')" type="text" class="form-control" ng-model="modelFilter[t.id]"  ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations)">
+                    <select ng-if="t.filterType === 'select'" ng-options="x.id as x.descricao for x in t.filterOptions" class="form-control" ng-model="modelFilter[t.id]"  ng-change="filterDataTable(orderBy, modelFilter, limit, offset,  {type:'keyup'}, fixedSearchParams, relations)">
                     </select>
             </th>
 			<th ng-if="columnAction"></th>
@@ -55,6 +55,6 @@
 	</tbody>
 </table>
 <ul class="pagination">
-  <li ng-repeat="n in setPagesNumber(total, limit)"><a ng-click="selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter)">{:n:}</a></li>
+  <li ng-repeat="n in setPagesNumber(total, limit)"><a ng-click="selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations)">{:n:}</a></li>
 </ul>
 

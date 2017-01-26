@@ -29,7 +29,7 @@ angular.module('defaultTable').controller("defaultTableCtrl", function($scope, $
 	  var urlList 	= $scope.urlList;
 	  var lista = lista;
 
-	  $scope.filterDataTable =  function (orderBy, modelFilter, limit, offset, evento){
+	  $scope.filterDataTable =  function (orderBy, modelFilter, limit, offset, evento, searchParams, relations){
 		  
 			if(evento.type == "click")
 				$scope.orderByTarget = evento.currentTarget.id;
@@ -51,7 +51,9 @@ angular.module('defaultTable').controller("defaultTableCtrl", function($scope, $
 				orderByTarget:orderByTarget, 
 				orderBy: orderBy, 
 				_token:token, 
-				modelFilter:modelFilter, 
+				modelFilter:modelFilter,
+                relations: relations,
+                fixedSearchParams: searchParams,
 				limit: limit,
 				offset: offset
 			};
@@ -89,9 +91,9 @@ angular.module('defaultTable').controller("defaultTableCtrl", function($scope, $
     		return pagination;
     	};
     	
-    	$scope.selectPage = function(n, total, perPage, number_pages, limit, orderBy, modelFilter){
+    	$scope.selectPage = function(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations){
     		var offset = limit*(n-1);		
-    		$scope.filterDataTable(orderBy, modelFilter, limit, offset, {});
+    		$scope.filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations);
     	};
     	
     	$scope.redirecionar = function(url){
@@ -108,6 +110,8 @@ angular.module('defaultTable').directive('defaultTable', function(){
 		      scope: {
 		    	lista: '=defaultTableLista',
 		    	columns: '=defaultTableColumnColumns',
+				fixedSearchParams: '=defaultTableFixedSearchParams',
+				relations: '=defaultTableRelations',
 		    	token: '@defaultTableToken',
 		    	urlList: '@defaultTableUrlList',
 		    	orderByTarget: '@defaultTableOrderBy',
