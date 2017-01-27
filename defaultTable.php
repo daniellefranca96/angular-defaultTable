@@ -39,7 +39,7 @@
 	<tbody>
 		<tr ng-repeat="l in lista track by $index">
 			<td ng-if="columnCheckbox"><input type="checkbox"></td>
-            <td align="{:c.tdAlign:}" ng-repeat="c in columns"><span ng-class="c.tdTextClass" ng-style="c.tdTextStyle">{:getTdColumn(l[c.id], c):}</span></td>
+            <td align="{:c.tdAlign:}" ng-repeat="c in columns"><span ng-class="c.tdTextClass" ng-style="c.tdTextStyle">{:getTdColumn(l, c):}</span></td>
 			<td align="middle" width="5%">
 				<a href="{:columnActionUrl+'/'+l[columnId]:}" class="btn {:columnActionClass:}" ng-show="columnActionSwitch == 'url'">
 					{:columnActionLabel:}
