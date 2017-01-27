@@ -13,20 +13,17 @@
 	        </div> <!-- btn-group ::end::-->
 	      </div> <!-- btns-group ::end::-->
 	</div>
-	<div class="col-md-2 pull-right" ng-if="selectLinePerPage && selectLinePerPageValues.length>0">
-		<select ng-model="limit" class="form-control" ng-change="filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations)" ng-options="x for x in selectLinePerPageValues">
-		</select>
-	</div>
 </div>
 <br>
+{:filter:}
 <table class="table table-bordered table-hover" role="grid" ng="lista.length">
 	<thead>
 		<tr>
 			<th width="5%" ng-if="columnCheckbox"></th>
-			<th ng-repeat="t in columns"><a id="{:t.id:}" ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations)">{:t.descricao:}</a></th>
+			<th ng-repeat="t in columns"><a ng-if="ajax" id="{:t.id:}" ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations)">{:t.descricao:}</a><span ng-if="!ajax">{:t.descricao:}</span></th>
 			<th ng-if="columnAction"></th>
 		</tr>
-		<tr>
+		<tr ng-if="ajax">
 			<th width="5%" ng-if="columnCheckbox"></th>
 			<th ng-repeat="t in columns">
 				<input ng-if="(t.filter == undefined || t.filter !== false) && (!t.filterType || t.filterType === 'input')" type="text" class="form-control" ng-model="modelFilter[t.id]"  ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations)">
@@ -37,7 +34,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="l in lista track by $index">
+		<tr ng-repeat="l in lista track by $index" align="{:columnsAlign:}">
 			<td ng-if="columnCheckbox"><input type="checkbox"></td>
             <td align="{:c.tdAlign:}" ng-repeat="c in columns"><span ng-class="c.tdTextClass" ng-style="c.tdTextStyle">{:getTdColumn(l, c):}</span></td>
 			<td align="middle" width="5%">
@@ -54,6 +51,12 @@
 		</tr>
 	</tbody>
 </table>
+<div class="row">
+    <div class="col-md-2 pull-right" ng-if="selectLinePerPage && selectLinePerPageValues.length>0">
+        <select ng-model="limit" class="form-control" ng-change="filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations)" ng-options="x for x in selectLinePerPageValues">
+        </select>
+    </div>
+</div>
 <ul class="pagination">
   <li ng-repeat="n in setPagesNumber(total, limit)"><a ng-click="selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations)">{:n:}</a></li>
 </ul>

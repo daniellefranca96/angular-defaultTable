@@ -110,6 +110,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
         scope: {
             lista: '=defaultTableLista',
             columns: '=defaultTableColumnColumns',
+            columnsAlign: '@defaultTableColumnColumnsAlign',
             fixedSearchParams: '=defaultTableFixedSearchParams',
             relations: '=defaultTableRelations',
             token: '@defaultTableToken',
@@ -117,6 +118,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
             orderByTarget: '@defaultTableOrderBy',
             limit: '=defaultTableLimit',
             total: '=defaultTableTotal',
+            filterAjax:  '=defaultTableAjax',
             columnId: '@defaultTableColumnId',
             columnAction: '@defaultTableColumnAction',
             columnActionUrl: '@defaultTableColumnActionUrl',
@@ -132,6 +134,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
         controller: "defaultTableCtrl",
         link: function (scope, element, attrs, ctrl) {
 
+            scope.ajax =  scope.filterAjax ? scope.filterAjax : true;
 
             scope.getTdColumn = function (v, c) {
 
