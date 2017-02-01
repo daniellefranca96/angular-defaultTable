@@ -3,24 +3,24 @@ angular.module('defaultTable', [], function ($interpolateProvider) {
     $interpolateProvider.endSymbol(':}');
 });
 
-//angular.module('defaultTable').provider('defaultTableProvider', function(){
-//	var baseUrl = "";
-//	
-//	var setBaseUrl = function setBaseUrl(value){
-//		baseUrl = value;
-//	}
-//	
-//	var getBaseUrl = function setBaseUrl(){
-//		return baseUrl;
-//	}
-//	
-//	this.$get = function () {
-//		return {
-//			getBaseUrl:getBaseUrl,
-//			setBaseUrl: setBaseUrl
-//		};
-//    };
-//})
+/*angular.module('defaultTable').provider('defaultTableProvider', function(){
+ var baseUrl = "";
+
+ var setBaseUrl = function setBaseUrl(value){
+ baseUrl = value;
+ }
+
+ var getBaseUrl = function setBaseUrl(){
+ return baseUrl;
+ }
+
+ this.$get = function () {
+ return {
+ getBaseUrl:getBaseUrl,
+ setBaseUrl: setBaseUrl
+ };
+ };
+ })*/
 
 angular.module('defaultTable').controller("defaultTableCtrl", function ($scope, $http, $filter) {
     $scope.offset = 0;
@@ -28,8 +28,11 @@ angular.module('defaultTable').controller("defaultTableCtrl", function ($scope, 
     var token = $scope.token;
     var urlList = $scope.urlList;
     var lista = lista;
+    var urlFilter = $scope.customFilterUrl ? $scope.customFilterUrl : "/filter-data-table";
 
     $scope.filterDataTable = function (orderBy, modelFilter, limit, offset, evento, searchParams, relations, $filter) {
+
+        console.log("aki");
 
         if (evento.type == "click")
             $scope.orderByTarget = evento.currentTarget.id;
@@ -62,7 +65,7 @@ angular.module('defaultTable').controller("defaultTableCtrl", function ($scope, 
             async: false,
             method: 'POST',
             data: data,
-            url: urlList + "/filter-data-table",
+            url: urlList + urlFilter,
         }).then(function successCallback(response) {
             $scope.lista = response.data.data;
 
@@ -99,7 +102,6 @@ angular.module('defaultTable').controller("defaultTableCtrl", function ($scope, 
     $scope.redirecionar = function (url) {
         window.location.href = url;
     };
-
 });
 
 angular.module('defaultTable').directive('defaultTable', function ($filter) {
@@ -108,7 +110,8 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
         templateUrl: '/default-table',
         transclude: true,
         scope: {
-            lista: '=defaultTableLista',
+            listaData: '=defaultTableLista',
+            acess: '=defaultTableAcess',
             columns: '=defaultTableColumnColumns',
             columnsAlign: '@defaultTableColumnColumnsAlign',
             fixedSearchParams: '=defaultTableFixedSearchParams',
@@ -116,9 +119,15 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
             token: '@defaultTableToken',
             urlList: '@defaultTableUrlList',
             orderByTarget: '@defaultTableOrderBy',
+            toggle: '@defaultTableToggle',
+            toogleId: '@defaultTableToggleId',
+            toggleColumns: '=defaultTableToggleColumns',
+            toggleIconExpand: '@defaultTableToggleIconExpand',
+            toggleIconCollapse: '@defaultTableToggleIconCollapse',
+            customFilterUrl: '@defaultTableCustomFilterUrl',
             limit: '=defaultTableLimit',
             total: '=defaultTableTotal',
-            filterAjax:  '=defaultTableAjax',
+            filterAjax: '=defaultTableAjax',
             columnId: '@defaultTableColumnId',
             columnAction: '@defaultTableColumnAction',
             columnActionUrl: '@defaultTableColumnActionUrl',
@@ -126,7 +135,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
             columnActionClass: '@defaultTableColumnActionClass',
             columnActionLabel: '@defaultTableColumnActionLabel',
             columnCheckbox: '=defaultTableColumnCheckbox',
-            checkboxModel: '=defaultTableCheckboxModel',
+            checkAction: '&defaultTableColumnCheckAction',
             buttonActions: '=defaultTableButtonActions',
             selectLinePerPage: '=defaultTableSelectLinePerPage',
             selectLinePerPageValues: '=defaultTableSelectLinePerPageValues',
@@ -134,7 +143,29 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
         controller: "defaultTableCtrl",
         link: function (scope, element, attrs, ctrl) {
 
-            scope.ajax =  scope.filterAjax ? scope.filterAjax : true;
+            if (scope.toggle) {
+
+                scope.toggleClick = [];
+
+                l = [];
+
+                if (scope.listaData.length > 0) {
+                    angular.forEach(scope.listaData, function (value) {
+                        l.push(value);
+                        var toggle = {toogle: true, value: value[scope.toogleId], id:value[scope.columnId]};
+                        l.push(toggle)
+
+                    });
+                }
+
+                scope.lista = l;
+
+            } else
+                scope.lista = scope.listaData;
+
+
+            scope.ajax = scope.filterAjax ? scope.filterAjax : true;
+            scope.checked = {};
 
             scope.getTdColumn = function (v, c) {
 
@@ -167,15 +198,27 @@ angular.module('defaultTable').directive('defaultTable', function ($filter) {
 
             };
 
-
-            scope.getColumnsTotal = function (columnCheckbox, columnAction, columns) {
-                var checkbox = scope.columnCheckbox ? 1 : 0;
-                var action = scope.columnAction ? 1 : 0;
-                return columns + action + checkbox;
+            scope.getColumnsTotal = function () {
+                var checkbox =      scope.columnCheckbox ? 1 : 0;
+                var action =        scope.columnAction ? 1 : 0;
+                var toogle =        scope.toggle ? 1 : 0;
+                var columns =       scope.columns.length;
+                return columns + action + checkbox+toogle;
             }
 
             scope.columnActionSwitch = "url";
             scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
+
+
+            if (scope.acess) {
+                scope.acess.setChecked = function (checked) {
+                    if (checked && checked.length > 0) {
+                        angular.forEach(checked, function (value) {
+                            scope.checked[value] = true;
+                        });
+                    }
+                };
+            }
 
         },
     };
@@ -187,7 +230,7 @@ angular.module('defaultTable').directive('defaultTableActionButton', function ()
         transclude: true,
         replace: true,
         require: '^defaultTable',
-        template: '<li><a ng-click="url ? redirecionar(url) : action({linhas:getLinhas()})"><i class="{:icone:}"></i>{:label:}{:getLinhas():}</a></li>',
+        template: '<li><a ng-click="url ? redirecionar(url) : action(selecionados)"><i class="{:icone:}"></i>{:label:}{:getLinhas():}</a></li>',
         scope: {
             action: "&defaultTableActionButtonMethod",
             url: "@defaultTableActionButtonUrl",
@@ -197,12 +240,10 @@ angular.module('defaultTable').directive('defaultTableActionButton', function ()
         },
         controller: "defaultTableCtrl",
         link: function (scope, element, attrs, ctrl) {
-
         }
     }
 });
 
-	
 	
 	
 	
