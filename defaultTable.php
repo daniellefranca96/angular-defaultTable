@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-md-4" ng-if="buttonActions">
+    <div class="col-md-4" ng-if="buttonActions.length > 0">
         <div class="btns-group">
             <div class="btn-group actions">
                 <a class="btn btn-primary" href="javascript:void(0)">
@@ -8,7 +8,10 @@
                 <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
                     <span class="fa fa-caret-down"></span>
                 </a>
-                <ul class="dropdown-menu" ng-transclude>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="a in buttonActions">
+                        <a ng-click="a.url ? redirecionar(a.url) : actionButton(selected, a)"><i class="{:a.icone:}"></i>{:a.label:}</a>
+                    </li>
                 </ul>
             </div> <!-- btn-group ::end::-->
         </div> <!-- btns-group ::end::-->
@@ -17,24 +20,26 @@
 <br>
 <table class="table table-bordered table-hover" role="grid" ng="lista.length" ng-init="toggleClick = []">
     <thead>
+   <!-- HEADER-->
     <tr>
         <th width="5%" ng-if="columnCheckbox"></th>
         <th width="5%" ng-if="toggle"></th>
-        <th ng-repeat="t in columns"><a ng-if="filterAjax || filterAjax == undefined" id="{:t.id:}"
-                                        ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations)">{:t.descricao:}</a><span
-                    ng-if="filterAjax == false">{:t.descricao:}</span></th>
+        <th ng-repeat="t in columns">
+            <a ng-if="(filterAjax || filterAjax == undefined)" id="{:t.id:}"
+                    ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">{:t.descricao:}</a><span ng-if="filterAjax == false">{:t.descricao:}</span></th>
         <th ng-if="columnAction"></th>
     </tr>
+   <!--FILTER-->
     <tr ng-if="filterAjax || filterAjax == undefined">
         <th width="5%" ng-if="columnCheckbox"></th>
         <th ng-if="toggle"></th>
         <th ng-repeat="t in columns">
             <input ng-if="(t.filter == undefined || t.filter !== false) && (!t.filterType || t.filterType === 'input')"
                    type="text" class="form-control" ng-model="modelFilter[t.id]"
-                   ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations)">
+                   ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">
             <select ng-if="t.filterType === 'select'" ng-options="x.id as x.descricao for x in t.filterOptions"
                     class="form-control" ng-model="modelFilter[t.id]"
-                    ng-change="filterDataTable(orderBy, modelFilter, limit, offset,  {type:'keyup'}, fixedSearchParams, relations)">
+                    ng-change="filterDataTable(orderBy, modelFilter, limit, offset,  {type:'keyup'}, fixedSearchParams, relations, customFilterMethod)">
             </select>
         </th>
         <th ng-if="columnAction"></th>
@@ -57,9 +62,8 @@
        <!-- CHECKBOX-->
         <td ng-if="columnCheckbox && !l.toogle">
             <input type="checkbox"
-                   ng-click="checkAction({elemento:l, status:selecionados[l[columnId]]})"
-                   ng-model="selecionados[l[columnId]]"
-                   ng-checked="checked[l[columnId]]">
+                   ng-click="checkAction({elemento:l, status:selecionados[l[columnId]]}, setSelected(l, selecionados[l[columnId]], columnId))"
+                   ng-model="selecionados[l[columnId]]">
         </td>
         <!--TOGGLE-->
         <th ng-if="!l.toogle && toggle">
@@ -83,7 +87,7 @@
         <td ng-if="l.toogle" colspan="{:getColumnsTotal():}" ng-show="toggleClick[l.id]">
             <table class="table table-bordered table-hover">
                 <tr>
-                    <th width="2%">{:toggleClick[l[columnId]]:}</th>
+                    <th width="2%"></th>
                     <th ng-repeat="c in toggleColumns">{:c.descricao:}</th>
                 </tr>
                 <tr ng-repeat="v in l.value track by $index">
@@ -104,14 +108,14 @@
 <div class="row">
     <div class="col-md-2 pull-right" ng-if="selectLinePerPage && selectLinePerPageValues.length>0">
         <select ng-model="limit" class="form-control"
-                ng-change="filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations)"
+                ng-change="filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations, customFilterMethod)"
                 ng-options="x for x in selectLinePerPageValues">
         </select>
     </div>
 </div>
 <ul class="pagination" ng-if="filterAjax || filterAjax == undefined">
     <li ng-repeat="n in setPagesNumber(total, limit)"><a
-                ng-click="selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations)">{:n:}</a>
+                ng-click="selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod)">{:n:}</a>
     </li>
 </ul>
 
