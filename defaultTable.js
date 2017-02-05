@@ -23,9 +23,6 @@ angular.module('defaultTable', [], function ($interpolateProvider) {
  })*/
 
 angular.module('defaultTable').controller("defaultTableCtrl", function ($scope, $http, $filter) {
-    $scope.teste = function(elemento, status){
-        console.log(elemento);
-    };
 
 });
 
@@ -80,6 +77,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             scope.columnActionSwitch = "url";
             scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
             scope.ajax = scope.filterAjax ? scope.filterAjax : true;
+            scope.modelFilter = {};
             scope.selected = [];
 
             scope.setSelected = function (elemento, status, columnId) {
@@ -259,6 +257,24 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             scope.redirecionar = function (url) {
                 window.location.href = url;
             };
+
+            scope.getFilters = function(columns){
+                filters = {};
+
+                if(columns.length>0){
+                    angular.forEach(columns, function(c){
+                        if(c.type == undefined && c.filter != false)
+                            filters[c.id] = scope.modelFilter[c.id];
+                    });
+                }
+
+                return filters;
+            }
+
+            scope.filterOrderBy = function(column){
+                scope.orderByTarget = scope.orderBy ? "-"+column : "+"+column;
+                scope.orderBy = !scope.orderBy;
+            }
 
             if (scope.acess) {
                 scope.acess.setChecked = function (checked) {

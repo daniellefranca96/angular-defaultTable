@@ -12,13 +12,15 @@
 <script src="defaultTable.js"></script>
 <body ng-controller="defaultTableCtrl">
 <div class="panel panel-default">
-    <div class="panel-body">
+    <div class="panel-body" ng-init="total = 4">
         <default-table
+                default-table-limit="2"
+                default-table-total="total"
                 default-table-lista="[
-                    {id:1, descricao:'Apple'},
+                    {id:4, descricao:'Apple'},
                     {id:2, descricao:'Harry Potter'},
                     {id:3, descricao:'Google'},
-                    {id:3, descricao:'Youtube'},
+                    {id:1, descricao:'Youtube'},
                     ]"
                 default-table-column-columns="[
                                                 {type:'checkbox', action:teste},
@@ -28,6 +30,8 @@
                                                 {type:'action', buttonClass:'btn-danger', label:'Deletar'}
                                               ]"
                 default-table-button-actions="[{icone:'fa fa-ban fa-fw', label:'Deletar', url:''}]"
+                default-table-select-line-per-page="true"
+                default-table-select-line-per-page-values="[2, 5, 10]"
                 default-table-ajax="false">
         </default-table>
     </div>

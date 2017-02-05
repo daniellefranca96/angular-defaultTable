@@ -38,7 +38,8 @@
                 <a ng-if="(filterAjax || filterAjax == undefined)" id="{:t.id:}"
                    ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">{:t.descricao:}</a>
                 <!--COLUMNS WITHOUT AJAX-->
-                <span ng-if="filterAjax == false">{:t.descricao:}</span></th>
+                <a ng-if="filterAjax == false" ng-click="filterOrderBy(t.id)">{:t.descricao:}</a>
+            </th>
             <!--COLUMN ACTION-->
             <th ng-if="columnAction"></th>
         </tr>
@@ -80,10 +81,10 @@
                 <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false)">
                     <!--INPUT-->
                     <input ng-if="(!t.filterType || t.filterType === 'input')"
-                           type="text" class="form-control" ng-model="modelFilter[t.id]" ng-model="search">
+                           type="text" class="form-control" ng-model="modelFilter[t.id]">
                     <!--SELECT-->
                     <select ng-if="t.filterType === 'select'" ng-options="x.id as x.descricao for x in t.filterOptions"
-                            class="form-control" ng-model="modelFilter[t.id]" ng-model="search">
+                            class="form-control" ng-model="modelFilter[t.id]">
                     </select>
                 </i>
             </th>
@@ -97,7 +98,7 @@
 
     <!--BODY-->
     <tbody>
-        <tr ng-repeat="l in lista | filter:search" align="{:columnsAlign:}">
+        <tr ng-repeat="l in lista | filter:getFilters(columns) | orderBy: orderByTarget | limitTo:limit:offset" align="{:columnsAlign:}">
 
             <i ng-if="!l.toogle">
                 <!-- CHECKBOX-->
@@ -187,8 +188,8 @@
 <!--SELECT PER PAGE-->
 <div class="row">
     <div class="col-md-2 pull-right" ng-if="selectLinePerPage && selectLinePerPageValues.length>0">
-        <select ng-model="limit" class="form-control"
-                ng-change="filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations, customFilterMethod)"
+        <select ng-model="$parent.limit" class="form-control"
+                ng-change="filterAjax ? filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations, customFilterMethod) : $parent.limit = limit"
                 ng-options="x for x in selectLinePerPageValues">
         </select>
     </div>
@@ -196,9 +197,9 @@
 <!--SELECT PER PAGE-->
 
 <!--PAGINATION-->
-<ul class="pagination" ng-if="filterAjax || filterAjax == undefined">
+<ul class="pagination">
     <li ng-repeat="n in setPagesNumber(total, limit)"><a
-            ng-click="selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod)">{:n:}</a>
+            ng-click="filterAjax != false ? selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod) : $parent.offset = n">{:n:}</a>
     </li>
 </ul>
 <!--PAGINATION-->
