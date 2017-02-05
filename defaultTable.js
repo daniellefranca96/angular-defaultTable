@@ -23,14 +23,17 @@ angular.module('defaultTable', [], function ($interpolateProvider) {
  })*/
 
 angular.module('defaultTable').controller("defaultTableCtrl", function ($scope, $http, $filter) {
-
+    $scope.teste = function(elemento, status){
+        console.log(elemento);
+    };
 
 });
+
 
 angular.module('defaultTable').directive('defaultTable', function ($filter, $http) {
     return {
         restrict: 'EA',
-        templateUrl: '/default-table',
+        templateUrl: 'defaultTable.html',
         transclude: true,
         scope: {
             listaData: '=defaultTableLista',
@@ -269,28 +272,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
         },
     };
-});
-
-angular.module('defaultTable').directive('defaultTableActionButton', function () {
-    return {
-        restrict: 'EA',
-        transclude: true,
-        replace: true,
-        require: '^defaultTable',
-        template: '<li><a ng-click="url ? redirecionar(url) : action(selecionados)"><i class="{:icone:}"></i>{:label:}{:getLinhas():}</a></li>',
-        scope: {
-            action: "&defaultTableActionButtonMethod",
-            url: "@defaultTableActionButtonUrl",
-            label: "@defaultTableActionButtonLabel",
-            icone: "@defaultTableActionButtonIcone",
-            customDelete: "@defaultTableActionButtonCustomDelete",
-        },
-        link: function (scope, element, attrs, ctrl) {
-            scope.redirecionar = function (url) {
-                window.location.href = url;
-            };
-        }
-    }
 });
 
 	
