@@ -1,67 +1,66 @@
-angular.module('defaultTable', [], function ($interpolateProvider) {
-    $interpolateProvider.startSymbol('{:');
-    $interpolateProvider.endSymbol(':}');
-});
+angular.module('defaultTable', []);
 
-/*angular.module('defaultTable').provider('defaultTableProvider', function(){
- var baseUrl = "";
+angular.module('defaultTable').provider('defaultTableConfig', function ($interpolateProvider) {
 
- var setBaseUrl = function setBaseUrl(value){
- baseUrl = value;
- }
+    var options = {
+        urlTemplate: 'defaultTable.html',
+    };
 
- var getBaseUrl = function setBaseUrl(){
- return baseUrl;
- }
 
- this.$get = function () {
- return {
- getBaseUrl:getBaseUrl,
- setBaseUrl: setBaseUrl
- };
- };
- })*/
+    this.set = function (opts) {
+        angular.extend(options, opts);
+    };
+	
+	this.setInterpolationSymbols = function(startSymbol, endSymbol){
+        $interpolate.startSymbol(startSymbol);
+        $interpolate.endSymbol(endSymbol);
+	};
+	
+
+    this.$get = function () {
+        return function () {
+            return angular.copy(options);
+        };
+    };
+})
 
 angular.module('defaultTable').controller("defaultTableCtrl", function ($scope, $http, $filter) {
 
 });
 
-
-angular.module('defaultTable').directive('defaultTable', function ($filter, $http) {
+angular.module('defaultTable').directive('defaultTable', function ($filter, $http, defaultTableConfig) {
     return {
         restrict: 'EA',
-        templateUrl: 'defaultTable.html',
+        templateUrl: defaultTableConfig().urlTemplate,
         transclude: true,
         scope: {
-            listaData: '=defaultTableLista',
+            listData: '=defaultTableList',
             acess: '=defaultTableAcess',
             columns: '=defaultTableColumnColumns',
             columnsAlign: '@defaultTableColumnColumnsAlign',
             fixedSearchParams: '=defaultTableFixedSearchParams',
             relations: '=defaultTableRelations',
             token: '@defaultTableToken',
+            trStyle: '=defaultTableTrStyle',
+            trActionMethod: '&?defaultTableTrAction',
             urlList: '@defaultTableUrlList',
             customFilterMethod: '&?defaultTableCustomFilterMethod',
             orderByTarget: '@defaultTableOrderBy',
             toggle: '@defaultTableToggle',
-            toogleId: '@defaultTableToggleId',
+            toggleId: '@defaultTableToggleId',
             toggleColumns: '=defaultTableToggleColumns',
             toggleIconExpand: '@defaultTableToggleIconExpand',
             toggleIconCollapse: '@defaultTableToggleIconCollapse',
+            toggleColumnId: '@defaultTableColumnId',
             customFilterUrl: '@defaultTableCustomFilterUrl',
             limit: '=defaultTableLimit',
             total: '=defaultTableTotal',
             filterAjax: '=defaultTableAjax',
             columnId: '@defaultTableColumnId',
-            columnAction: '@defaultTableColumnAction',
-            columnActionUrl: '@defaultTableColumnActionUrl',
-            columnActionMethod: '&defaultTableColumnActionMethod',
-            columnActionClass: '@defaultTableColumnActionClass',
-            columnActionLabel: '@defaultTableColumnActionLabel',
-            columnCheckbox: '=defaultTableColumnCheckbox',
-            checkAction: '&?defaultTableColumnCheckAction',
             buttonActions: '=defaultTableButtonActions',
-            message: '=defaultTableMessage',
+            buttonActionsLabel: '@defaultTableButtonActionsLabel',
+            buttonActionsClass: '@defaultTableButtonActionsClass',
+            buttonActionsIcon: '@defaultTableButtonActionsIcon',
             selectLinePerPage: '=defaultTableSelectLinePerPage',
             selectLinePerPageValues: '=defaultTableSelectLinePerPageValues',
         },
@@ -69,15 +68,19 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
             var token = scope.token;
             var urlList = scope.urlList;
-            var lista = lista;
             var urlFilter = scope.customFilterUrl ? scope.customFilterUrl : "/filter-data-table";
 
             scope.offset = 0;
             scope.orderBy = false;
             scope.columnActionSwitch = "url";
             scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
-            scope.ajax = scope.filterAjax ? scope.filterAjax : true;
+            scope.buttonActionsLabel = scope.buttonActionsLabel ? scope.buttonActionsLabel  : 'Actions';
+            scope.buttonActionsClass = scope.buttonActionsClass ? scope.buttonActionsClass  : 'btn btn-primary';
+            scope.buttonActionsIcon  = scope.buttonActionsIcon  ? scope.buttonActionsIcon   : 'fa fa-cogs';
             scope.modelFilter = {};
+            scope.checked = [];
+            scope.d = {limit:scope.limit};
+
             scope.selected = [];
 
             scope.setSelected = function (elemento, status, columnId) {
@@ -92,11 +95,32 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             }
 
             scope.actionButton = function (selected, action) {
+
                 if (action.customMethod == "customChangeStatus")
                     customChangeStatus(selected, action.customMethodAction);
-                else
-                    action.method({elements: selected});
+                else {
+                    var args = getArgs(action.method);
+                    if (args.indexOf("selected") != -1)
+                        action.method(selected);
+                    else
+                        action.method();
+                }
 
+
+            }
+
+            function getArgs(func) {
+                // First match everything inside the function argument parens.
+                var args = func.toString().match(/function\s.*?\(([^)]*)\)/)[1];
+
+                // Split the arguments string into an array comma delimited.
+                return args.split(',').map(function (arg) {
+                    // Ensure no inline comments are parsed and trim the whitespace.
+                    return arg.replace(/\/\*.*\*\//, '').trim();
+                }).filter(function (arg) {
+                    // Ensure no undefined values are added.
+                    return arg;
+                });
             }
 
             function customChangeStatus(selected, customMethodAction) {
@@ -130,11 +154,9 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 scope.orderBy = orderBy;
                 var orderByTarget = scope.orderByTarget;
 
-                if (orderBy)
-                    orderBy = "asc";
-                else
-                    orderBy = "desc";
 
+                orderByTarget = orderByTarget ? orderByTarget : scope.columnId;
+                orderBy = orderBy ? "asc" : "desc";
 
                 //INCLUIR NG-MODEL NA DIRECTIVA
                 scope.limit = limit;
@@ -151,20 +173,22 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     offset: offset
                 };
 
-                if(angular.isDefined(customFilterMethod)){
-                    customFilterMethod();
+                if (angular.isDefined(scope.customFilterMethod)) {
+                    scope.customFilterMethod({parameters: data});
 
                 } else {
                     $http({
-                        async: false,
                         method: 'POST',
                         data: data,
                         url: urlList + urlFilter,
                     }).then(function successCallback(response) {
-                        scope.lista = response.data.data;
 
-                        if (evento.type == "keyup")
-                            scope.total = response.data.total ? response.data.total : scope.total;
+                        if (response.data.success) {
+                            scope.listData = response.data.data;
+
+                            if (evento.type == "keyup")
+                                scope.total = response.data.total ? response.data.total : scope.total;
+                        }
 
                     }, function errorCallback(response) {
                         console.log(response.error);
@@ -193,27 +217,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 var offset = limit * (n - 1);
                 scope.filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations, customFilterMethod);
             };
-
-            if (scope.toggle) {
-
-                scope.toggleClick = [];
-
-                l = [];
-
-                if (scope.listaData.length > 0) {
-                    angular.forEach(scope.listaData, function (value) {
-                        l.push(value);
-                        var toggle = {toogle: true, value: value[scope.toogleId], id: value[scope.columnId]};
-                        l.push(toggle)
-
-                    });
-                }
-
-                scope.lista = l;
-
-            } else
-                scope.lista = scope.listaData;
-
 
             scope.getTdColumn = function (v, c) {
 
@@ -247,23 +250,35 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             };
 
             scope.getColumnsTotal = function () {
-                var checkbox = scope.columnCheckbox ? 1 : 0;
-                var action = scope.columnAction ? 1 : 0;
                 var toogle = scope.toggle ? 1 : 0;
                 var columns = scope.columns.length;
-                return columns + action + checkbox + toogle;
+                return columns + toogle;
             }
 
-            scope.redirecionar = function (url) {
+            scope.redirecionar = function (url, value = null) {
+
+                var parameters = url.match(/{[A-za-z]+}/);
+                if (parameters && value) {
+                    angular.forEach(parameters, function (p) {
+                        id = p.replace("{", "").replace("}", "");
+
+                        angular.forEach(scope.columns, function (c) {
+                            if (c.id == id)
+                                url = url.replace(p, value[c.id]);
+                        });
+
+                    });
+                }
+
                 window.location.href = url;
             };
 
-            scope.getFilters = function(columns){
+            scope.getFilters = function (columns, filterAjax) {
                 filters = {};
 
-                if(columns.length>0){
-                    angular.forEach(columns, function(c){
-                        if(c.type == undefined && c.filter != false)
+                if (columns.length > 0 && !filterAjax) {
+                    angular.forEach(columns, function (c) {
+                        if (c.type == undefined && c.filter != false)
                             filters[c.id] = scope.modelFilter[c.id];
                     });
                 }
@@ -271,9 +286,36 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 return filters;
             }
 
-            scope.filterOrderBy = function(column){
-                scope.orderByTarget = scope.orderBy ? "-"+column : "+"+column;
+            scope.filterOrderBy = function (column) {
+                scope.orderByTarget2 = scope.orderBy ? "-" + column : "+" + column;
                 scope.orderBy = !scope.orderBy;
+            }
+
+            scope.trAction = function(linha, method){
+                if(angular.isDefined(method)){
+                    method({linha:linha});
+                }
+            }
+
+            getExecptions();
+
+            function getExecptions() {
+
+                if (!angular.isDefined(scope.columnId) && scope.filterAjax)
+                    throw "The property columnId is obrigatory!";
+
+                if (!angular.isDefined(scope.listData))
+                    throw "The property lista is obrigatory!";
+
+                if (!angular.isDefined(scope.total))
+                    throw "The property total is obrigatory!";
+
+                if (scope.toggle) {
+                    if (!angular.isDefined(scope.toggleId))
+                        throw "The property toggleId is obrigatory!";
+                    if (!angular.isDefined(scope.toggleColumnId))
+                        throw "The property toggleColumnId is obrigatory!";
+                }
             }
 
             if (scope.acess) {
@@ -284,12 +326,23 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                         });
                     }
                 };
+
+                scope.acess.refreshTable = function (data) {
+                    if (data)
+                        scope.listData = data;
+                    else if(scope.filterAjax)
+                        scope.filterDataTable(scope.orderBy, scope.modelFilter, scope.limit, scope.offset, {type: "keyup"}, scope.searchParams, scope.relations, scope.customFilterMethod);
+                };
+
+                scope.acess.getSelected = function(){
+                    return scope.selected;
+                };
             }
 
         },
     };
 });
 
-	
-	
-	
+
+
+
