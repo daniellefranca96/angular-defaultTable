@@ -61,8 +61,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             buttonActionsLabel: '@defaultTableButtonActionsLabel',
             buttonActionsClass: '@defaultTableButtonActionsClass',
             buttonActionsIcon: '@defaultTableButtonActionsIcon',
-            selectLinePerPage: '=defaultTableSelectLinePerPage',
-            selectLinePerPageValues: '=defaultTableSelectLinePerPageValues',
+            selectPerPage: '=defaultTableSelectPerPage',
         },
         link: function (scope, element, attrs, ctrl) {
 

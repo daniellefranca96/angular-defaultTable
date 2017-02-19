@@ -33,7 +33,7 @@
         <th ng-repeat="t in columns" width="{{t.type == 'checkbox' ? '2%' : (t.type == 'action' ? '5%' : '')}}">
             <!-- COLUMNS WITH AJAX-->
             <a ng-if="filterAjax" id="{{t.id}}"
-               ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">{{t.label}}</a>
+               ng-click="filterDataTable(!orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">{{t.label}}</a>
             <!--COLUMNS WITHOUT AJAX-->
             <a ng-if="!filterAjax" ng-click="filterOrderBy(t.id)">{{t.label}}</a>
         </th>
@@ -50,11 +50,11 @@
                 <!-- INPUT-->
                 <input ng-if="(!t.filterType || t.filterType === 'input')"
                        type="text" class="form-control" ng-model="modelFilter[t.id]"
-                       ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">
+                       ng-keyup="filterDataTable(orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">
                 <!--SELECT-->
                 <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
                         class="form-control" ng-model="modelFilter[t.id]"
-                        ng-change="filterDataTable(orderBy, modelFilter, limit, offset,  {type:'keyup'}, fixedSearchParams, relations, customFilterMethod)">
+                        ng-change="filterDataTable(orderBy, modelFilter, d.limit, offset,  {type:'keyup'}, fixedSearchParams, relations, customFilterMethod)">
                 </select>
             </i>
         </th>
@@ -105,7 +105,7 @@
             <span ng-if="c.type==undefined" ng-class="c.tdTextClass" ng-style="c.tdTextStyle">{{getTdColumn(l, c)}}</span>
 
             <!--ACTION-->
-            <a ng-if="c.type=='action'" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)" class="btn {{c.buttonClass}}">{{c.label}}</a>
+            <a ng-if="c.type=='action'" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)" class="btn {{c.buttonClass}}"><i class="{{c.buttonIcon}}"></i>{{c.label}}</a>
         </td>
         <!-- CONTENT-->
 
@@ -162,10 +162,10 @@
 
 <!--SELECT PER PAGE-->
 <div class="row" ng-if="listData.length">
-    <div class="col-md-2 pull-right" ng-if="selectLinePerPage && selectLinePerPageValues.length>0">
-        <select ng-model="$parent.limit" class="form-control"
-                ng-change="filterAjax ? filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations, customFilterMethod) : d.limit = limit"
-                ng-options="x for x in selectLinePerPageValues">
+    <div class="col-md-2 pull-right" ng-if="selectPerPage.length>0">
+        <select ng-model="d.limit" class="form-control"
+                ng-change="filterAjax ? filterDataTable(orderBy, modelFilter, d.limit, offset, {}, fixedSearchParams, relations, customFilterMethod) : null"
+                ng-options="x for x in selectPerPage">
         </select>
     </div>
 </div>
@@ -173,8 +173,8 @@
 
 <!--PAGINATION-->
 <ul class="pagination">
-    <li ng-repeat="n in setPagesNumber(total, limit)">
-        <a ng-click="filterAjax ? selectPage(n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod) : $parent.offset = limit * (n - 1)">{{n}}</a>
+    <li ng-repeat="n in setPagesNumber(total, d.limit)">
+        <a ng-click="filterAjax ? selectPage(n, total, perPage, number_pages, d.limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod) : $parent.offset = d.limit * (n - 1)">{{n}}</a>
     </li>
 </ul>
 <!--PAGINATION-->

@@ -17,21 +17,20 @@
                 default-table-limit="2"
                 default-table-total="total"
                 default-table-list="[
-                    {id:4, label:'Apple', number:{number:1}, date:'2015-01-22'},
-                    {id:2, label:'Microsoft', number:{number:2}, date:'2015-01-22'},
-                    {id:3, label:'Google', number:{number:3}, date:'2015-01-22'},
-                    {id:1, label:'Yahoo', number:{number:4}, date:'2015-01-22'},
+                    {id:4, label:'Apple'},
+                    {id:2, label:'Microsoft'},
+                    {id:3, label:'Google'},
+                    {id:1, label:'Yahoo'},
                     ]"
                 default-table-column-columns="[
                                                 {type:'checkbox'},
                                                 {id:'id', label:'Id'},
                                                 {id:'label', label:'Description'},
-                                                {type:'action', buttonClass:'btn-primary', label:'Edit'},
+                                                {type:'action', buttonClass:'btn-primary', label:'Edit', buttonIcon:'glyphicon glyphicon-pencil'},
                                                 {type:'action', buttonClass:'btn-danger', label:'Delete'}
                                               ]"
                 default-table-button-actions="[{icone:'fa fa-ban fa-fw', label:'Deletar'}]"
-                default-table-select-line-per-page="true"
-                default-table-select-line-per-page-values="[2, 5, 10]">
+                default-table-select-per-page="[2, 5, 10]">
         </default-table>
     </div>
 </div>
