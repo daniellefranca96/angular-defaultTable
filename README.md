@@ -182,10 +182,38 @@ var data = {
      };
 ```
 
+### Toggle
+The toggle feature display a another table under each line, in order to this to work your array of data must have another array of objects with the toggle values.
+
+**Toggle**<br/>
+The attribute `default-table-toggle` is a boolean that defines if the feature is active.<br/>
+
+**Toggle Id**<br/>
+The attribute `default-table-toggle-id` is the index of the toggle values in the data array.<br/>
+
+**Toggle Columns**<br/>
+The attribute `default-table-toggle-columns` array of objects with the same format and parameters of the one in the table.<br/>
+
+**Toggle Icon Expand**<br/>
+The attribute `default-table-toggle-icon-expand` defines the expand icon.<br/>
+
+**Toggle Icon Collapse**<br/>
+The attribute `default-table-toggle-icon-collpase` defines the collapse icon.<br/>
 
 
+## Custom Template Url
+In case of the template not be able to be included and generate an error, you can define a custom url.<br/>
+P.S.: This must be used in Laravel, the template must be include in the routes to work.
 
+```
+app.config(["defaultTableConfig", function(defaultTableConfig) {
+  defaultTableConfig.set({urlTemplate:'default-url'});
+}]);
+```
 
+## License
+
+MIT
 
 
 
