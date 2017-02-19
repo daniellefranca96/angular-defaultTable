@@ -33,9 +33,9 @@
         <th ng-repeat="t in columns" width="{{t.type == 'checkbox' ? '2%' : (t.type == 'action' ? '5%' : '')}}">
             <!-- COLUMNS WITH AJAX-->
             <a ng-if="filterAjax" id="{{t.id}}"
-               ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">{{t.descricao}}</a>
+               ng-click="filterDataTable(!orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">{{t.label}}</a>
             <!--COLUMNS WITHOUT AJAX-->
-            <a ng-if="!filterAjax" ng-click="filterOrderBy(t.id)">{{t.descricao}}</a>
+            <a ng-if="!filterAjax" ng-click="filterOrderBy(t.id)">{{t.label}}</a>
         </th>
     </tr>
     <!-- COLUMNS-->
@@ -52,7 +52,7 @@
                        type="text" class="form-control" ng-model="modelFilter[t.id]"
                        ng-keyup="filterDataTable(orderBy, modelFilter, limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">
                 <!--SELECT-->
-                <select ng-if="t.filterType === 'select'" ng-options="x.id as x.descricao for x in t.filterOptions"
+                <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
                         class="form-control" ng-model="modelFilter[t.id]"
                         ng-change="filterDataTable(orderBy, modelFilter, limit, offset,  {type:'keyup'}, fixedSearchParams, relations, customFilterMethod)">
                 </select>
@@ -72,7 +72,7 @@
                 <input ng-if="(!t.filterType || t.filterType === 'input')"
                        type="text" class="form-control" ng-model="modelFilter[t.id]">
                 <!--SELECT-->
-                <select ng-if="t.filterType === 'select'" ng-options="x.id as x.descricao for x in t.filterOptions"
+                <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
                         class="form-control" ng-model="modelFilter[t.id]">
                 </select>
             </i>
@@ -118,7 +118,7 @@
                 <tr>
                     <th width="2%"></th>
                     <th ng-repeat="c in toggleColumns">
-                        <span ng-if="c.type == undefined">{{c.descricao}}</span>
+                        <span ng-if="c.type == undefined">{{c.label}}</span>
                     </th>
                 </tr>
                 <!--HEADER-->

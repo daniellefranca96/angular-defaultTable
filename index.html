@@ -17,22 +17,21 @@
                 default-table-limit="2"
                 default-table-total="total"
                 default-table-list="[
-                    {id:4, descricao:'Apple'},
-                    {id:2, descricao:'Harry Potter'},
-                    {id:3, descricao:'Google'},
-                    {id:1, descricao:'Youtube'},
+                    {id:4, label:'Apple', number:{number:1}, date:'2015-01-22'},
+                    {id:2, label:'Microsoft', number:{number:2}, date:'2015-01-22'},
+                    {id:3, label:'Google', number:{number:3}, date:'2015-01-22'},
+                    {id:1, label:'Yahoo', number:{number:4}, date:'2015-01-22'},
                     ]"
                 default-table-column-columns="[
                                                 {type:'checkbox'},
-                                                {id:'id', descricao:'Id'},
-                                                {id:'descricao', descricao:'Description'},
+                                                {id:'id', label:'Id'},
+                                                {id:'label', label:'Description'},
                                                 {type:'action', buttonClass:'btn-primary', label:'Edit'},
                                                 {type:'action', buttonClass:'btn-danger', label:'Delete'}
                                               ]"
-                default-table-button-actions="[{icone:'fa fa-ban fa-fw', label:'Deletar', url:''}]"
+                default-table-button-actions="[{icone:'fa fa-ban fa-fw', label:'Deletar'}]"
                 default-table-select-line-per-page="true"
-                default-table-select-line-per-page-values="[2, 5, 10]"
-                default-table-ajax="false">
+                default-table-select-line-per-page-values="[2, 5, 10]">
         </default-table>
     </div>
 </div>

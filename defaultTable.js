@@ -220,15 +220,20 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
             scope.getTdColumn = function (v, c) {
 
-                if (v[c.id]) {
-                    if (c.value) {
-                        index = c.value.split(".");
+                value = "";
+
+                if (c.id) {
+                    if (c.id.indexOf(".") != -1) {
+                        index = c.id.split(".");
 
                         angular.forEach(index, function (value) {
-                            v = v[value];
+                            if(v[value])
+                                v = v[value];
+                            else
+                                throw Error("Index of column not exist");
                         });
                     } else
-                        v = v[c.id];
+                        v = v[c.id] ? v[c.id] : "";
 
 
                     if (c.expression)
@@ -236,12 +241,20 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     else if (v)
                         value = v;
 
-                    if (c.filter && value) {
-                        value = c.filter == 'date' ? new Date(value) : value;
-                        var filter = $filter(c.filter);
-                        value = filter(value, c.filterValue);
+                    if (c.afilters && value) {
+                        angular.forEach(c.afilters, function (f, k) {
+                            value = f.filter == 'date' ? new Date(value) : value;
+                            var filter = $filter(f.filter);
+
+                            if(f.filterValue)
+                                value = filter(value, f.filterValue.join(","));
+                            else
+                                value = filter(value);
+                        });
                     }
-                } else
+                }
+
+                if(!value)
                     value = c.null ? c.null : "";
 
 
