@@ -1,6 +1,8 @@
 # angular-defaultTable
 
-A table for AngularJs with sorting, filtering, pagination, ajax and more.
+A table for AngularJs with sorting, filtering, pagination, ajax and more.<br/>
+
+[Demo](https://plnkr.co/edit/9OkioBtUJo9czYxtC9Ob?p=preview)
 
 ## Requirements
 - Angular 1.6 or higher
