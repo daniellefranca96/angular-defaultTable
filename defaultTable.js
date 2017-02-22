@@ -10,12 +10,12 @@ angular.module('defaultTable').provider('defaultTableConfig', function ($interpo
     this.set = function (opts) {
         angular.extend(options, opts);
     };
-	
-	this.setInterpolationSymbols = function(startSymbol, endSymbol){
+
+    this.setInterpolationSymbols = function (startSymbol, endSymbol) {
         $interpolate.startSymbol(startSymbol);
         $interpolate.endSymbol(endSymbol);
-	};
-	
+    };
+
 
     this.$get = function () {
         return function () {
@@ -41,6 +41,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             fixedSearchParams: '=defaultTableFixedSearchParams',
             relations: '=defaultTableRelations',
             token: '@defaultTableToken',
+            checkedValues: '=defaultTableCheckedValues',
             trStyle: '=defaultTableTrStyle',
             trActionMethod: '&?defaultTableTrAction',
             urlList: '@defaultTableUrlList',
@@ -56,6 +57,8 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             limit: '=defaultTableLimit',
             total: '=defaultTableTotal',
             filterAjax: '=defaultTableAjax',
+            onlySelectedCheck: '=?defaultTableOnlySelected',
+            onlySelectedLabel: '@defaultTableOnlySelectedLabel',
             columnId: '@defaultTableColumnId',
             buttonActions: '=defaultTableButtonActions',
             buttonActionsLabel: '@defaultTableButtonActionsLabel',
@@ -73,23 +76,48 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             scope.orderBy = false;
             scope.columnActionSwitch = "url";
             scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
-            scope.buttonActionsLabel = scope.buttonActionsLabel ? scope.buttonActionsLabel  : 'Actions';
-            scope.buttonActionsClass = scope.buttonActionsClass ? scope.buttonActionsClass  : 'btn btn-primary';
-            scope.buttonActionsIcon  = scope.buttonActionsIcon  ? scope.buttonActionsIcon   : 'fa fa-cogs';
+            scope.buttonActionsLabel = scope.buttonActionsLabel ? scope.buttonActionsLabel : 'Actions';
+            scope.buttonActionsClass = scope.buttonActionsClass ? scope.buttonActionsClass : 'btn btn-primary';
+            scope.buttonActionsIcon = scope.buttonActionsIcon ? scope.buttonActionsIcon : 'fa fa-cogs';
+            scope.onlySelectedLabel = scope.onlySelectedLabel ? scope.onlySelectedLabel : "Only Selected";
             scope.modelFilter = {};
             scope.checked = [];
-            scope.d = {limit:scope.limit};
-
+            scope.d = {};
+            scope.d.limit = scope.limit ? scope.limit : 5;
+            scope.list = scope.listData;
             scope.selected = [];
+            var checkedValues = [];
+
+            scope.onlySelected = function (status) {
+                if (status)
+                    if (!scope.filterAjax) {
+                        scope.list = scope.selected;
+                    } else
+                        scope.filterDataTable(scope.orderBy, scope.modelFilter, scope.d.limit, scope.offset, {type: "keyup"}, scope.fixedSearchParams, scope.relations, scope.customFilterMethod, true);
+                else {
+                    if (!scope.filterAjax)
+                        scope.list = scope.listData;
+                    else
+                        scope.filterDataTable(scope.orderBy, scope.modelFilter, scope.d.limit, scope.offset, {type: "keyup"}, scope.fixedSearchParams, scope.relations, scope.customFilterMethod);
+                }
+            };
 
             scope.setSelected = function (elemento, status, columnId) {
-                if (status)
+                if (status) {
                     scope.selected.push(elemento);
 
-                else {
+                    if (checkedValues.indexOf(elemento[columnId]) == -1)
+                        checkedValues.push(elemento[columnId]);
+
+
+                } else {
                     scope.selected = scope.selected.filter(function (m) {
                         if (m[columnId] != elemento[columnId]) return true;
-                    })
+                    });
+
+                    var index = checkedValues.indexOf(elemento[columnId]);
+                    if (index != -1)
+                        delete checkedValues[index];
                 }
             }
 
@@ -135,8 +163,9 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     var offset = scope.offset;
                     var fixedSearchParams = scope.fixedSearchParams;
                     var relations = scope.relations;
+                    var oselected = scope.oselected;
 
-                    scope.filterDataTable(orderBy, modelFilter, limit, offset, {type: "keyup"}, fixedSearchParams, relations);
+                    scope.filterDataTable(orderBy, modelFilter, limit, offset, {type: "keyup"}, fixedSearchParams, relations, oselected);
 
                     scope.selected = [];
 
@@ -145,7 +174,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 });
             }
 
-            scope.filterDataTable = function (orderBy, modelFilter, limit, offset, evento, searchParams, relations, customFilterMethod, $filter) {
+            scope.filterDataTable = function (orderBy, modelFilter, limit, offset, evento, searchParams, relations, customFilterMethod, oselected) {
 
                 if (evento.type == "click")
                     scope.orderByTarget = evento.currentTarget.id;
@@ -157,9 +186,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 orderByTarget = orderByTarget ? orderByTarget : scope.columnId;
                 orderBy = orderBy ? "asc" : "desc";
 
-                //INCLUIR NG-MODEL NA DIRECTIVA
-                scope.limit = limit;
-                scope.modelFilter = modelFilter;
 
                 var data = {
                     orderByTarget: orderByTarget,
@@ -169,7 +195,8 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     relations: relations,
                     fixedSearchParams: searchParams,
                     limit: limit,
-                    offset: offset
+                    offset: offset,
+                    onlySelected: onlySelected ? checkedValues : []
                 };
 
                 if (angular.isDefined(scope.customFilterMethod)) {
@@ -183,10 +210,12 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     }).then(function successCallback(response) {
 
                         if (response.data.success) {
-                            scope.listData = response.data.data;
+                            if (!onlySelected)
+                                scope.listData = scope.listData;
 
-                            if (evento.type == "keyup")
-                                scope.total = response.data.total ? response.data.total : scope.total;
+                            scope.list = response.data.data;
+                            setChecked(checkedValues);
+                            scope.total = response.data.total;
                         }
 
                     }, function errorCallback(response) {
@@ -212,9 +241,9 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 return pagination;
             };
 
-            scope.selectPage = function (n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod) {
+            scope.selectPage = function (n, total, perPage, number_pages, limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod, oselected) {
                 var offset = limit * (n - 1);
-                scope.filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations, customFilterMethod);
+                scope.filterDataTable(orderBy, modelFilter, limit, offset, {}, fixedSearchParams, relations, customFilterMethod, oselected);
             };
 
             scope.getTdColumn = function (v, c) {
@@ -226,7 +255,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                         index = c.id.split(".");
 
                         angular.forEach(index, function (value) {
-                            if(v[value])
+                            if (v[value])
                                 v = v[value];
                             else
                                 throw Error("Index of column not exist");
@@ -245,7 +274,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                             value = f.filter == 'date' ? new Date(value) : value;
                             var filter = $filter(f.filter);
 
-                            if(f.filterValue)
+                            if (f.filterValue)
                                 value = filter(value, f.filterValue.join(","));
                             else
                                 value = filter(value);
@@ -253,7 +282,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     }
                 }
 
-                if(!value)
+                if (!value)
                     value = c.null ? c.null : "";
 
 
@@ -303,9 +332,9 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 scope.orderBy = !scope.orderBy;
             }
 
-            scope.trAction = function(linha, method){
-                if(angular.isDefined(method)){
-                    method({linha:linha});
+            scope.trAction = function (linha, method) {
+                if (angular.isDefined(method)) {
+                    method({linha: linha});
                 }
             }
 
@@ -317,7 +346,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     throw "The property columnId is obrigatory!";
 
                 if (!angular.isDefined(scope.listData))
-                    throw "The property lista is obrigatory!";
+                    throw "The property list is obrigatory!";
 
                 if (!angular.isDefined(scope.total))
                     throw "The property total is obrigatory!";
@@ -330,31 +359,52 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 }
             }
 
-            if (scope.acess) {
-                scope.acess.setChecked = function (checked) {
-                    if (checked && checked.length > 0) {
-                        angular.forEach(checked, function (value) {
+            function setChecked(checked) {
+
+                if (checked && checked.length > 0) {
+                    angular.forEach(checked, function (value) {
+                        if (typeof value == 'object') {
+                            scope.checked[value[scope.columnId]] = true;
+                            if (checkedValues.indexOf(value[scope.columnId]) == -1)
+                                checkedValues.push(value[scope.columnId]);
+
+                        } else {
                             scope.checked[value] = true;
-                        });
-                    }
-                };
+                            if (checkedValues.indexOf(value) == -1)
+                                checkedValues.push(value);
 
-                scope.acess.refreshTable = function (data) {
-                    if (data)
-                        scope.listData = data;
-                    else if(scope.filterAjax)
-                        scope.filterDataTable(scope.orderBy, scope.modelFilter, scope.limit, scope.offset, {type: "keyup"}, scope.searchParams, scope.relations, scope.customFilterMethod);
-                };
+                        }
+                    });
+                }
 
-                scope.acess.getSelected = function(){
-                    return scope.selected;
-                };
+            };
+
+            function refreshTable(data) {
+                if (data) {
+                    scope.listData = data;
+                    scope.list = data;
+                } else
+                    scope.filterDataTable(scope.orderBy, scope.modelFilter, scope.d.limit, scope.offset, {type: "keyup"}, scope.fixedSearchParams, scope.relations, scope.customFilterMethod, scope.oselected);
+            };
+
+            function addNewLine(elemento) {
+                scope.list.push(elemento);
+            };
+
+            function setFixedParamns(fixedParams) {
+                scope.fixedSearchParams = fixedParams;
             }
+
+            if (scope.acess) {
+                scope.acess.setChecked = setChecked;
+                scope.acess.refreshTable = refreshTable;
+                scope.acess.addNewLine = addNewLine;
+                scope.acess.setFixedParamns = setFixedParamns;
+            }
+
+            if (scope.checkedValues && scope.checkedValues.length > 0)
+                setChecked(scope.checkedValues);
 
         },
     };
 });
-
-
-
-

@@ -11,171 +11,181 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li ng-repeat="a in buttonActions">
-                        <a ng-click="a.url ? redirecionar(a.url) : actionButton(selected, a)"><i class="{{a.icone}}"></i>&nbsp;{{a.label}}</a>
+                        <a ng-click="a.url ? redirecionar(a.url) : actionButton(selected, a)"><i
+                                    class="{{a.icone}}"></i>&nbsp;{{a.label}}</a>
                     </li>
                 </ul>
             </div> <!-- btn-group ::end::-->
         </div> <!-- btns-group ::end::-->
     </div>
-</div>
-<!--ACTIONS-->
-<br>
-
-<!--TABLE-->
-<table class="table table-bordered table-hover" role="grid"  ng-init="toggleClick = []">
-    <!-- HEADER-->
-    <thead>
-    <!-- COLUMNS-->
-    <tr>
-        <!-- TOOGLE-->
-        <th width="5%" ng-if="toggle"></th>
-        <!-- COLUMNS-->
-        <th ng-repeat="t in columns" width="{{t.type == 'checkbox' ? '2%' : (t.type == 'action' ? '5%' : '')}}">
-            <!-- COLUMNS WITH AJAX-->
-            <a ng-if="filterAjax" id="{{t.id}}"
-               ng-click="filterDataTable(!orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">{{t.label}}</a>
-            <!--COLUMNS WITHOUT AJAX-->
-            <a ng-if="!filterAjax" ng-click="filterOrderBy(t.id)">{{t.label}}</a>
-        </th>
-    </tr>
-    <!-- COLUMNS-->
-
-    <!--FILTER WITH AJAX-->
-    <tr ng-if="filterAjax">
-        <!-- TOOGLE-->
-        <th ng-if="toggle"></th>
-        <!-- COLUMNS-->
-        <th ng-repeat="t in columns">
-            <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false)">
-                <!-- INPUT-->
-                <input ng-if="(!t.filterType || t.filterType === 'input')"
-                       type="text" class="form-control" ng-model="modelFilter[t.id]"
-                       ng-keyup="filterDataTable(orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod)">
-                <!--SELECT-->
-                <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
-                        class="form-control" ng-model="modelFilter[t.id]"
-                        ng-change="filterDataTable(orderBy, modelFilter, d.limit, offset,  {type:'keyup'}, fixedSearchParams, relations, customFilterMethod)">
-                </select>
-            </i>
-        </th>
-    </tr>
-    <!--FILTER AJAX-->
-
-    <!--FILTER WITHOUT AJAX-->
-    <tr ng-if="!filterAjax">
-        <!--TOGGLE-->
-        <th ng-if="toggle"></th>
-        <!--COLUMNS-->
-        <th ng-repeat="t in columns">
-            <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false)">
-                <!--INPUT-->
-                <input ng-if="(!t.filterType || t.filterType === 'input')"
-                       type="text" class="form-control" ng-model="modelFilter[t.id]">
-                <!--SELECT-->
-                <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
-                        class="form-control" ng-model="modelFilter[t.id]">
-                </select>
-            </i>
-        </th>
-    </tr>
-    <!--FILTER WITHOUT AJAX-->
-
-    </thead>
-    <!-- HEADER-->
-
-    <!--BODY-->
-    <tbody>
-    <tr ng-repeat-start="l in listData | filter:getFilters(columns, filterAjax) | orderBy: orderByTarget2 | limitTo:d.limit:offset" align="{{columnsAlign}}" ng-style="trStyle" ng-click="trAction(l, trActionMethod)">
-
-        <!--TOGGLE-->
-        <th ng-if="toggle">
-            <span ng-click="toggleClick[l[columnId]] = !toggleClick[l[columnId]]" class="{{toggleClick[l[columnId]] ? toggleIconCollapse : toggleIconExpand}}"></span>
-        </th>
-        <!--TOGGLE-->
-
-        <!-- CONTENT-->
-        <td align="{{c.tdAlign}}" ng-repeat="c in columns" ng-init="toggleClick[l[columnId]] = false">
-
-            <!-- CHECKBOX-->
-            <input ng-if="c.type=='checkbox'" type="checkbox"
-                   ng-click="c.action(l, selecionados[l[columnId]], $element); setSelected(l, selecionados[l[columnId]], columnId)"
-                   ng-model="selecionados[l[columnId]]" ng-checked="checked[l[columnId]]">
-
-            <!--COLUMN-->
-            <span ng-if="c.type==undefined" ng-class="c.tdTextClass" ng-style="c.tdTextStyle">{{getTdColumn(l, c)}}</span>
-
-            <!--ACTION-->
-            <a ng-if="c.type=='action'" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)" class="btn {{c.buttonClass}}"><i class="{{c.buttonIcon}}"></i>{{c.label}}</a>
-        </td>
-        <!-- CONTENT-->
-
-    </tr>
-    <tr ng-repeat-end ng-show="toggleClick[l[columnId]]">
-        <!-- TOOGLE COLUMNS-->
-        <td colspan="{{getColumnsTotal()}}">
-            <table class="table table-bordered table-hover">
-                <!--HEADER-->
-                <tr>
-                    <th width="2%"></th>
-                    <th ng-repeat="c in toggleColumns">
-                        <span ng-if="c.type == undefined">{{c.label}}</span>
-                    </th>
-                </tr>
-                <!--HEADER-->
-
-                <!-- COLUMNS-->
-                <tr ng-repeat="v in l[toggleId]">
-                    <td width="2%"></td>
-                    <td align="{{tv.tdAlign}}" ng-repeat="tv in toggleColumns track by $index">
-                        <!-- CHECKBOX-->
-                        <input ng-if="tv.type=='checkbox'" type="checkbox"
-                               ng-click="tv.action({elemento:v, status:selecionados[v[toggleColumnId]]}); setSelected(v, selecionados[v[toggleColumnId]], toggleColumnId)"
-                               ng-model="selecionados[v[toggleColumnId]]" ng-checked="checked[v[toggleColumnId]]">
-
-                        <!-- COLUMN-->
-                        <span ng-if="tv.type==undefined" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle">{{getTdColumn(v, tv)}}</span>
-
-                        <!--ACTION-->
-                        <a ng-if="tv.type=='action'" type="button" ng-click="tv.url ? redirecionar(tv.url, v) : tv.action({elemento: v})" class="btn {{tv.buttonClass}}">{{tv.label}}</a>
-                    </td>
-                </tr>
-                <!--HEADER-->
-
-            </table>
-        </td>
-        <!-- TOOGLE COLUMNS-->
-    </tr>
-
-    <!--WITHOUT DATA-->
-    <tr ng-if="listData.length == 0">
-        <td colspan="{{getColumnsTotal()}}"
-            style="font-weight:bold;fontsize:16px;" align="middle">Não há dados cadastrados!
-        </td>
-    </tr>
-    <!--WITHOUT DATA-->
-
-    </tbody>
-    <!--BODY-->
-
-</table>
-<!--ACTIONS-->
-
-<!--SELECT PER PAGE-->
-<div class="row" ng-if="listData.length">
-    <div class="col-md-2 pull-right" ng-if="selectPerPage.length>0">
-        <select ng-model="d.limit" class="form-control"
-                ng-change="filterAjax ? filterDataTable(orderBy, modelFilter, d.limit, offset, {}, fixedSearchParams, relations, customFilterMethod) : null"
-                ng-options="x for x in selectPerPage">
-        </select>
+    <div class="col-md-4 col-md-offset-10" ng-show="onlySelectedCheck">
+        <input type="checkbox" ng-model="oselected" ng-change="onlySelected(oselected)">&nbsp;<strong>{{onlySelectedLabel}}</strong>
     </div>
 </div>
-<!--SELECT PER PAGE-->
+    <!--ACTIONS-->
+    <br>
 
-<!--PAGINATION-->
-<ul class="pagination">
-    <li ng-repeat="n in setPagesNumber(total, d.limit)">
-        <a ng-click="filterAjax ? selectPage(n, total, perPage, number_pages, d.limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod) : $parent.offset = d.limit * (n - 1)">{{n}}</a>
-    </li>
-</ul>
-<!--PAGINATION-->
+    <!--TABLE-->
+    <table class="table table-bordered table-hover" role="grid" ng-init="toggleClick = []">
+        <!-- HEADER-->
+        <thead>
+        <!-- COLUMNS-->
+        <tr>
+            <!-- TOOGLE-->
+            <th width="5%" ng-if="toggle"></th>
+            <!-- COLUMNS-->
+            <th ng-repeat="t in columns" width="{{t.type == 'checkbox' ? '2%' : (t.type == 'action' ? '5%' : '')}}">
+                <!-- COLUMNS WITH AJAX-->
+                <a ng-if="filterAjax" id="{{t.id}}"
+                   ng-click="filterDataTable(!orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod, oselected)">{{t.label}}</a>
+                <!--COLUMNS WITHOUT AJAX-->
+                <a ng-if="!filterAjax" ng-click="filterOrderBy(t.id)">{{t.label}}</a>
+            </th>
+        </tr>
+        <!-- COLUMNS-->
+
+        <!--FILTER WITH AJAX-->
+        <tr ng-if="filterAjax">
+            <!-- TOOGLE-->
+            <th ng-if="toggle"></th>
+            <!-- COLUMNS-->
+            <th ng-repeat="t in columns">
+                <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false)">
+                    <!-- INPUT-->
+                    <input ng-if="(!t.filterType || t.filterType === 'input')"
+                           type="text" class="form-control" ng-model="modelFilter[t.id]"
+                           ng-keyup="filterDataTable(orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod, oselected)">
+                    <!--SELECT-->
+                    <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
+                            class="form-control" ng-model="modelFilter[t.id]"
+                            ng-change="filterDataTable(orderBy, modelFilter, d.limit, offset,  {type:'keyup'}, fixedSearchParams, relations, customFilterMethod, oselected)">
+                    </select>
+                </i>
+            </th>
+        </tr>
+        <!--FILTER AJAX-->
+
+        <!--FILTER WITHOUT AJAX-->
+        <tr ng-if="!filterAjax">
+            <!--TOGGLE-->
+            <th ng-if="toggle"></th>
+            <!--COLUMNS-->
+            <th ng-repeat="t in columns">
+                <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false)">
+                    <!--INPUT-->
+                    <input ng-if="(!t.filterType || t.filterType === 'input')"
+                           type="text" class="form-control" ng-model="modelFilter[t.id]">
+                    <!--SELECT-->
+                    <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
+                            class="form-control" ng-model="modelFilter[t.id]">
+                    </select>
+                </i>
+            </th>
+        </tr>
+        <!--FILTER WITHOUT AJAX-->
+
+        </thead>
+        <!-- HEADER-->
+
+        <!--BODY-->
+        <tbody>
+        <tr ng-repeat-start="l in list | filter:getFilters(columns, filterAjax) | orderBy: orderByTarget2 | limitTo:d.limit:offset"
+            align="{{columnsAlign}}" ng-style="trStyle" ng-click="trAction(l, trActionMethod)">
+
+            <!--TOGGLE-->
+            <th ng-if="toggle">
+            <span ng-click="toggleClick[l[columnId]] = !toggleClick[l[columnId]]"
+                  class="{{toggleClick[l[columnId]] ? toggleIconCollapse : toggleIconExpand}}"></span>
+            </th>
+            <!--TOGGLE-->
+
+            <!-- CONTENT-->
+            <td align="{{c.tdAlign}}" ng-repeat="c in columns" ng-init="toggleClick[l[columnId]] = false">
+
+                <!-- CHECKBOX-->
+                <input ng-if="c.type=='checkbox'" type="checkbox"
+                       ng-click="c.action(l, selecionados[l[columnId]], $element); setSelected(l, selecionados[l[columnId]], columnId)"
+                       ng-model="selecionados[l[columnId]]" ng-checked="checked[l[columnId]];">
+
+                <!--COLUMN-->
+                <span ng-if="c.type==undefined" ng-class="c.tdTextClass"
+                      ng-style="c.tdTextStyle">{{getTdColumn(l, c)}}</span>
+
+                <!--ACTION-->
+                <a ng-if="c.type=='action'" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)"
+                   class="btn {{c.buttonClass}}"><i class="{{c.buttonIcon}}"></i>{{c.label}}</a>
+            </td>
+            <!-- CONTENT-->
+
+        </tr>
+        <tr ng-repeat-end ng-show="toggleClick[l[columnId]]">
+            <!-- TOOGLE COLUMNS-->
+            <td colspan="{{getColumnsTotal()}}">
+                <table class="table table-bordered table-hover">
+                    <!--HEADER-->
+                    <tr>
+                        <th width="2%"></th>
+                        <th ng-repeat="c in toggleColumns">
+                            <span ng-if="c.type == undefined">{{c.label}}</span>
+                        </th>
+                    </tr>
+                    <!--HEADER-->
+
+                    <!-- COLUMNS-->
+                    <tr ng-repeat="v in l[toggleId]">
+                        <td width="2%"></td>
+                        <td align="{{tv.tdAlign}}" ng-repeat="tv in toggleColumns track by $index">
+                            <!-- CHECKBOX-->
+                            <input ng-if="tv.type=='checkbox'" type="checkbox"
+                                   ng-click="tv.action({elemento:v, status:selecionados[v[toggleColumnId]]}); setSelected(v, selecionados[v[toggleColumnId]], toggleColumnId)"
+                                   ng-model="selecionados[v[toggleColumnId]]" ng-checked="checked[v[toggleColumnId]]">
+
+                            <!-- COLUMN-->
+                            <span ng-if="tv.type==undefined" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle">{{getTdColumn(v, tv)}}</span>
+
+                            <!--ACTION-->
+                            <a ng-if="tv.type=='action'" type="button"
+                               ng-click="tv.url ? redirecionar(tv.url, v) : tv.action({elemento: v})"
+                               class="btn {{tv.buttonClass}}">{{tv.label}}</a>
+                        </td>
+                    </tr>
+                    <!--HEADER-->
+
+                </table>
+            </td>
+            <!-- TOOGLE COLUMNS-->
+        </tr>
+
+        <!--WITHOUT DATA-->
+        <tr ng-if="listData.length == 0">
+            <td colspan="{{getColumnsTotal()}}"
+                style="font-weight:bold;fontsize:16px;" align="middle">Não há dados cadastrados!
+            </td>
+        </tr>
+        <!--WITHOUT DATA-->
+
+        </tbody>
+        <!--BODY-->
+
+    </table>
+    <!--ACTIONS-->
+
+    <!--SELECT PER PAGE-->
+    <div class="row" ng-if="listData.length">
+        <div class="col-md-2 pull-right" ng-if="selectPerPage.length>0">
+            <select ng-model="d.limit" class="form-control"
+                    ng-change="filterAjax ? filterDataTable(orderBy, modelFilter, d.limit, offset, {}, fixedSearchParams, relations, customFilterMethod, oselected) : null"
+                    ng-options="x for x in selectPerPage">
+            </select>
+        </div>
+    </div>
+    <!--SELECT PER PAGE-->
+
+    <!--PAGINATION-->
+    <ul class="pagination">
+        <li ng-repeat="n in setPagesNumber(total, d.limit)">
+            <a ng-click="filterAjax ? selectPage(n, total, perPage, number_pages, d.limit, orderBy, modelFilter, fixedSearchParams, relations, customFilterMethod, oselected) : $parent.offset = d.limit * (n - 1)">{{n}}</a>
+        </li>
+    </ul>
+    <!--PAGINATION-->
 
