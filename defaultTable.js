@@ -73,7 +73,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             var urlFilter = scope.customFilterUrl ? scope.customFilterUrl : "/filter-data-table";
 
             scope.offset = 0;
-            scope.orderBy = false;
+            scope.orderBy = scope.orderByTarget.length>0 ? true : false;
             scope.columnActionSwitch = "url";
             scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
             scope.buttonActionsLabel = scope.buttonActionsLabel ? scope.buttonActionsLabel : 'Actions';
@@ -162,12 +162,11 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     var limit = scope.limit;
                     var offset = scope.offset;
                     var fixedSearchParams = scope.fixedSearchParams;
+					var customFilterMethod = scope.customFilterMethod;
                     var relations = scope.relations;
                     var oselected = scope.oselected;
 
-                    scope.filterDataTable(orderBy, modelFilter, limit, offset, {type: "keyup"}, fixedSearchParams, relations, oselected);
-
-                    scope.selected = [];
+                    scope.filterDataTable(orderBy, modelFilter, limit, offset, {type: "keyup"}, fixedSearchParams, relations, customFilterMethod, oselected);
 
                 }, function errorCallback(response) {
                     console.log(response.error);
@@ -196,7 +195,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     fixedSearchParams: searchParams,
                     limit: limit,
                     offset: offset,
-                    onlySelected: onlySelected ? checkedValues : []
+					onlySelected: oselected ? checkedValues : [],
                 };
 
                 if (angular.isDefined(scope.customFilterMethod)) {
@@ -210,8 +209,8 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     }).then(function successCallback(response) {
 
                         if (response.data.success) {
-                            if (!onlySelected)
-                                scope.listData = scope.listData;
+                            if (!oselected)
+                                scope.listData = response.data.data;
 
                             scope.list = response.data.data;
                             setChecked(checkedValues);

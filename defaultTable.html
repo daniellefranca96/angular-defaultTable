@@ -36,10 +36,10 @@
             <!-- COLUMNS-->
             <th ng-repeat="t in columns" width="{{t.type == 'checkbox' ? '2%' : (t.type == 'action' ? '5%' : '')}}">
                 <!-- COLUMNS WITH AJAX-->
-                <a ng-if="filterAjax" id="{{t.id}}"
+                <a ng-if="filterAjax && !t.type" id="{{t.id}}"
                    ng-click="filterDataTable(!orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod, oselected)">{{t.label}}</a>
                 <!--COLUMNS WITHOUT AJAX-->
-                <a ng-if="!filterAjax" ng-click="filterOrderBy(t.id)">{{t.label}}</a>
+                <a ng-if="!filterAjax && !t.type" ng-click="filterOrderBy(t.id)">{{t.label}}</a>
             </th>
         </tr>
         <!-- COLUMNS-->
