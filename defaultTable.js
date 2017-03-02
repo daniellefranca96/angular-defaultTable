@@ -298,14 +298,11 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             scope.redirecionar = function (url, value = null) {
 
                 var parameters = url.match(/{[A-za-z]+}/);
+               
                 if (parameters && value) {
                     angular.forEach(parameters, function (p) {
                         id = p.replace("{", "").replace("}", "");
-
-                        angular.forEach(scope.columns, function (c) {
-                            if (c.id == id)
-                                url = url.replace(p, value[c.id]);
-                        });
+                        url = url.replace(p, value[id]);
 
                     });
                 }
