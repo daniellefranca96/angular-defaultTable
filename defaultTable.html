@@ -107,9 +107,13 @@
                        ng-click="c.action(l, selecionados[l[columnId]], $element); setSelected(l, selecionados[l[columnId]], columnId)"
                        ng-model="selecionados[l[columnId]]" ng-checked="checked[l[columnId]];">
 
-                <!--COLUMN-->
-                <span ng-if="c.type==undefined" ng-class="c.tdTextClass"
-                      ng-style="c.tdTextStyle">{{getTdColumn(l, c)}}</span>
+                 <!--COLUMN-->
+	            <span ng-if="c.type==undefined && !c.html" ng-class="c.tdTextClass"
+	                  ng-style="c.tdTextStyle">{{getTdColumn(l, c)}}</span>
+	                  
+	           	<span ng-if="c.type==undefined && c.html" ng-class="c.tdTextClass"
+	                  ng-style="c.tdTextStyle" ng-bind-html="getTdColumn(l, c) | renderHtml"></span> 
+	           	<!--COLUMN-->      
 
                 <!--ACTION-->
                 <a ng-if="c.type=='action'" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)"
@@ -140,8 +144,10 @@
                                    ng-click="tv.action({elemento:v, status:selecionados[v[toggleColumnId]]}); setSelected(v, selecionados[v[toggleColumnId]], toggleColumnId)"
                                    ng-model="selecionados[v[toggleColumnId]]" ng-checked="checked[v[toggleColumnId]]">
 
-                            <!-- COLUMN-->
-                            <span ng-if="tv.type==undefined" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle">{{getTdColumn(v, tv)}}</span>
+	                        <!-- COLUMN-->
+	                        <span ng-if="tv.type==undefined && !c.html" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle">{{getTdColumn(v, tv)}}</span>
+	                        <span ng-if="tv.type==undefined && c.html" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle"  ng-bind-html="getTdColumn(v, tv) | renderHtml"></span>
+	                        <!-- COLUMN-->
 
                             <!--ACTION-->
                             <a ng-if="tv.type=='action'" type="button"

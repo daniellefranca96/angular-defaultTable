@@ -1,5 +1,16 @@
 angular.module('defaultTable', []);
 
+angular.module('defaultTable').filter('renderHtml', function($sce) {
+
+	  
+	return function(stringToParse)
+	{
+		console.log(stringToParse);
+		return $sce.trustAsHtml(stringToParse);
+	}
+
+});
+
 angular.module('defaultTable').provider('defaultTableConfig', function ($interpolateProvider) {
 
     var options = {
@@ -263,9 +274,11 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                         v = v[c.id] ? v[c.id] : "";
 
 
-                    if (c.expression)
+                    if (c.expression) {
                         value = eval(c.expression.replace("{value}", v));
-                    else if (v)
+                    } else if(c.html) {
+                    	value = c.html.replace("{value}", v);
+                    } else if (v)
                         value = v;
 
                     if (c.afilters && value) {
@@ -283,7 +296,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
                 if (!value)
                     value = c.null ? c.null : "";
-
 
                 return value;
 
