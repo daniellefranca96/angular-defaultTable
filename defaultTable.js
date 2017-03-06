@@ -84,7 +84,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             var urlFilter = scope.customFilterUrl ? scope.customFilterUrl : "/filter-data-table";
 
             scope.offset = 0;
-            scope.orderBy = scope.orderByTarget.length>0 ? true : false;
+            scope.orderBy = scope.orderByTarget && scope.orderByTarget.length>0 ? true : false;
             scope.columnActionSwitch = "url";
             scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
             scope.buttonActionsLabel = scope.buttonActionsLabel ? scope.buttonActionsLabel : 'Actions';
@@ -368,7 +368,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             }
 
             function setChecked(checked) {
-
                 if (checked && checked.length > 0) {
                     angular.forEach(checked, function (value) {
                         if (typeof value == 'object') {
@@ -382,6 +381,22 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                                 checkedValues.push(value);
 
                         }
+
+
+                        var v = scope.listData.filter(function (e) {
+
+                            var columnId = scope.columnId;
+
+                            if(typeof value == 'object') {
+                                if (e[columnId] == value[columnId])
+                                    return true;
+                            } else {
+                                if (e[columnId] == value)
+                                    return true;
+                            }
+                        });
+
+                        scope.selected.push(v[0]);
                     });
                 }
 
