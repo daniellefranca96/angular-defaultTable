@@ -84,7 +84,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             var urlFilter = scope.customFilterUrl ? scope.customFilterUrl : "/filter-data-table";
 
             scope.offset = 0;
-            scope.orderBy = scope.orderByTarget && scope.orderByTarget.length>0 ? true : false;
+            scope.orderBy = scope.orderByTarget ? true : false;
             scope.columnActionSwitch = "url";
             scope.columnActionSwitch = scope.columnActionUrl ? "url" : "method";
             scope.buttonActionsLabel = scope.buttonActionsLabel ? scope.buttonActionsLabel : 'Actions';
