@@ -162,26 +162,28 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             }
 
             function customChangeStatus(selected, customMethodAction) {
-                $http({
-                    async: false,
-                    method: 'POST',
-                    data: {selected: selected, _token: token, customMethodAction: customMethodAction},
-                    url: urlList + "/change-status-all",
-                }).then(function successCallback(response) {
-                    var orderBy = scope.orderBy;
-                    var modelFilter = scope.modelFilter;
-                    var limit = scope.limit;
-                    var offset = scope.offset;
-                    var fixedSearchParams = scope.fixedSearchParams;
-					var customFilterMethod = scope.customFilterMethod;
-                    var relations = scope.relations;
-                    var oselected = scope.oselected;
+                if(selected.length > 0){
+                    $http({
+                        async: false,
+                        method: 'POST',
+                        data: {selected: selected, _token: token, customMethodAction: customMethodAction},
+                        url: urlList + "/change-status-all",
+                    }).then(function successCallback(response) {
+                        var orderBy = scope.orderBy;
+                        var modelFilter = scope.modelFilter;
+                        var limit = scope.limit;
+                        var offset = scope.offset;
+                        var fixedSearchParams = scope.fixedSearchParams;
+                        var customFilterMethod = scope.customFilterMethod;
+                        var relations = scope.relations;
+                        var oselected = scope.oselected;
 
-                    scope.filterDataTable(orderBy, modelFilter, limit, offset, {type: "keyup"}, fixedSearchParams, relations, customFilterMethod, oselected);
+                        scope.filterDataTable(orderBy, modelFilter, limit, offset, {type: "keyup"}, fixedSearchParams, relations, customFilterMethod, oselected);
 
-                }, function errorCallback(response) {
-                    console.log(response.error);
-                });
+                    }, function errorCallback(response) {
+                        console.log(response.error);
+                    });
+                }
             }
 
             scope.filterDataTable = function (orderBy, modelFilter, limit, offset, evento, searchParams, relations, customFilterMethod, oselected) {
@@ -408,6 +410,9 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     scope.list = data;
                 } else
                     scope.filterDataTable(scope.orderBy, scope.modelFilter, scope.d.limit, scope.offset, {type: "keyup"}, scope.fixedSearchParams, scope.relations, scope.customFilterMethod, scope.oselected);
+
+                scope.selected = [];
+                checkedValues = [];
             };
 
             function addNewLine(elemento) {
