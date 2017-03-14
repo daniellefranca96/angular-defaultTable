@@ -272,8 +272,10 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                             else
                                 throw Error("Index of column not exist");
                         });
-                    } else
+                    } else {
                         v = v[c.id] ? v[c.id] : "";
+                        c.original_index = c.id;
+                    }
 
 
                     if (c.expression) {

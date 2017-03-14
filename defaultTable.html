@@ -36,10 +36,10 @@
             <!-- COLUMNS-->
             <th ng-repeat="t in columns" width="{{t.type == 'checkbox' ? '2%' : (t.type == 'action' ? '5%' : '')}}">
                 <!-- COLUMNS WITH AJAX-->
-                <a ng-if="filterAjax && !t.type" id="{{t.id}}"
+                <a ng-if="filterAjax && !t.type" id="{{t.original_index}}"
                    ng-click="filterDataTable(!orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod, oselected)">{{t.label}}</a>
                 <!--COLUMNS WITHOUT AJAX-->
-                <a ng-if="!filterAjax && !t.type" ng-click="filterOrderBy(t.id)">{{t.label}}</a>
+                <a ng-if="!filterAjax && !t.type" ng-click="filterOrderBy(t.original_index)">{{t.label}}</a>
             </th>
         </tr>
         <!-- COLUMNS-->
@@ -57,7 +57,7 @@
                            ng-keyup="filterDataTable(orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod, oselected)">
                     <!--SELECT-->
                     <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
-                            class="form-control" ng-model="modelFilter[t.id]"
+                            class="form-control" ng-model="modelFilter[t.original_index]"
                             ng-change="filterDataTable(orderBy, modelFilter, d.limit, offset,  {type:'keyup'}, fixedSearchParams, relations, customFilterMethod, oselected)">
                     </select>
                 </i>
@@ -77,7 +77,7 @@
                            type="text" class="form-control" ng-model="modelFilter[t.id]">
                     <!--SELECT-->
                     <select ng-if="t.filterType === 'select'" ng-options="x.id as x.label for x in t.filterOptions"
-                            class="form-control" ng-model="modelFilter[t.id]">
+                            class="form-control" ng-model="modelFilter[t.original_index]">
                     </select>
                 </i>
             </th>
