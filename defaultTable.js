@@ -260,11 +260,12 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
             scope.getTdColumn = function (v, c) {
 
-                value = "";
+                var column = angular.copy(c);
+                var value = "";
 
-                if (c.id) {
-                    if (c.id.indexOf(".") != -1) {
-                        index = c.id.split(".");
+                if (column.id) {
+                    if (column.id.indexOf(".") != -1) {
+                        index = column.id.split(".");
 
                         angular.forEach(index, function (value) {
                             if (v[value])
@@ -273,21 +274,22 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                                 throw Error("Index of column not exist");
                         });
                     } else {
-                        v = v[c.id] ? v[c.id] : "";
-                        c.original_index = c.id;
+                        v = v[column.id] ? v[column.id] : "";
+                        column.original_index = column.id;
                     }
 
 
-                    if (c.expression) {
-                        value = eval(c.expression.replace("{value}", v));
-                    } else if(c.html) {
-                    	value = c.html.replace("{value}", v);
+
+                    if (column.expression) {
+                        value = eval(column.expression.replace("{value}", v));
+                    } else if(column.html) {
+                        value = column.html.replace("{value}", v);
                     } else if (v)
                         value = v;
 
-                    if (c.afilters && value) {
-                        angular.forEach(c.afilters, function (f, k) {
-                            value = f.filter == 'date' ? new Date(value) : value;
+                    if (column.afilters && value) {
+                        angular.forEach(column.afilters, function (f, k) {
+                            value = f.filter == 'date' ? new Date(value).setUTCHours(15) : value;
                             var filter = $filter(f.filter);
 
                             if (f.filterValue)
@@ -299,7 +301,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 }
 
                 if (!value)
-                    value = c.null ? c.null : "";
+                    value = column.null ? column.null : "";
 
                 return value;
 
