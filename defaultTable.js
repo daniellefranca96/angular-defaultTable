@@ -264,8 +264,8 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 var value = "";
 
                 if (column.id) {
-                    if (column.id.indexOf(".") != -1) {
-                        index = column.id.split(".");
+                    if (column.value) {
+                        index = column.value.split(".");
 
                         angular.forEach(index, function (value) {
                             if (v[value])
@@ -273,10 +273,9 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                             else
                                 throw Error("Index of column not exist");
                         });
-                    } else {
+                    } else
                         v = v[column.id] ? v[column.id] : "";
-                        column.original_index = column.id;
-                    }
+
 
 
 
