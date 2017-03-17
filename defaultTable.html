@@ -116,7 +116,7 @@
            <!--COLUMN-->      
 
             <!--ACTION-->
-            <a ng-if="c.type=='action'" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)"
+            <a ng-if="c.type=='action' && verifyActionIf(c, l)" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)"
                class="btn {{c.buttonClass}}"><i class="{{c.buttonIcon}}"></i>{{c.label}}</a>
         </td>
         <!-- CONTENT-->
@@ -150,7 +150,7 @@
                         <!-- COLUMN-->
 
                         <!--ACTION-->
-                        <a ng-if="tv.type=='action'" type="button"
+                        <a ng-if="tv.type=='action' &&  verifyActionIf(tv, v)" type="button"
                            ng-click="tv.url ? redirecionar(tv.url, v) : tv.action({elemento: v})"
                            class="btn {{tv.buttonClass}}">{{tv.label}}</a>
                     </td>
@@ -163,7 +163,7 @@
     </tr>
 
     <!--WITHOUT DATA-->
-    <tr ng-if="listData.length == 0">
+    <tr ng-if="list.length == 0">
         <td colspan="{{getColumnsTotal()}}"
             style="font-weight:bold;fontsize:16px;" align="middle">Não há dados cadastrados!
         </td>

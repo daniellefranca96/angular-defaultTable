@@ -351,6 +351,22 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 }
             }
 
+            scope.verifyActionIf = function(c, elemento){
+                if(c.if){
+                    var expression = c.if;
+                    var exp = expression.match(/{(.|\n)*?}/g);
+
+                    angular.forEach(exp, function(e){
+                        var column = e.replace("{").replace("}");
+                        expression = expression.replace(e, elemento[column]);
+                    });
+
+                    return eval(expression);
+                }
+
+                return true;
+            }
+
             getExecptions();
 
             function getExecptions() {
