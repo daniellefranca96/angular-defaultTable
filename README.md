@@ -45,11 +45,17 @@ The columns of the table are defined by the array of objects passed in the attri
 The attributes avaliable in this object are:
 
 - **Id**<br/>
-Index of the column in the array of data(if you have want to acess a property inside a object then just type index.property)
+Index of the column in the array of data
 ```
 {id:'name'}
-{id:'adress.number'}
 ```
+
+- **Value**<br/>
+Opcional attribute only used to show in the column a property inside an array of objects.
+```
+{value:'adress.number'}
+```
+
 - **Label**<br/>
 Label that is shown in the column header.
 ```
