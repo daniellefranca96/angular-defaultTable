@@ -36,10 +36,11 @@
         <!-- COLUMNS-->
         <th ng-repeat="t in columns" width="{{t.type == 'checkbox' ? '2%' : (t.type == 'action' ? '5%' : '')}}" ng-init="filterId = t.filterId ? t.filterId : t.id">
             <!-- COLUMNS WITH AJAX-->
-            <a ng-if="filterAjax && !t.type" id="{{filterId}}"
+
+            <a ng-if="filterAjax && !t.type && verifyIf(t, null)" id="{{filterId}}"
                ng-click="filterDataTable(!orderBy, modelFilter, d.limit, offset,  $event, fixedSearchParams, relations, customFilterMethod, oselected)">{{t.label}}</a>
             <!--COLUMNS WITHOUT AJAX-->
-            <a ng-if="!filterAjax && !t.type" ng-click="filterOrderBy(filterId)">{{t.label}}</a>
+            <a ng-if="!filterAjax && !t.type && verifyIf(t, null)" ng-click="filterOrderBy(filterId)">{{t.label}}</a>
         </th>
     </tr>
     <!-- COLUMNS-->
@@ -50,7 +51,7 @@
         <th ng-if="toggle"></th>
         <!-- COLUMNS-->
         <th ng-repeat="t in columns" ng-init="filterId = t.filterId ? t.filterId : t.id">
-            <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false)">
+            <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false) && verifyIf(t, null)">
                 <!-- INPUT-->
                 <input ng-if="(!t.filterType || t.filterType === 'input')"
                        type="text" class="form-control" ng-model="modelFilter[filterId]"
@@ -71,7 +72,7 @@
         <th ng-if="toggle"></th>
         <!--COLUMNS-->
         <th ng-repeat="t in columns" ng-init="filterId = t.filterId ? t.filterId : t.id">
-            <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false)">
+            <i ng-if="t.type == undefined && (t.filter == undefined || t.filter !== false) && verifyIf(t, null)">
                 <!--INPUT-->
                 <input ng-if="(!t.filterType || t.filterType === 'input')"
                        type="text" class="form-control" ng-model="modelFilter[filterId]">
@@ -103,20 +104,20 @@
         <td align="{{c.tdAlign}}" ng-repeat="c in columns" ng-init="toggleClick[l[columnId]] = false">
 
             <!-- CHECKBOX-->
-            <input ng-if="c.type=='checkbox'" type="checkbox"
+            <input ng-if="c.type=='checkbox' && verifyIf(c, l)" type="checkbox"
                    ng-click="c.action(l, selecionados[l[columnId]], $element); checkAction({elemento:l, status:selecionados[l[columnId]]}); setSelected(l, selecionados[l[columnId]], columnId)"
                    ng-model="selecionados[l[columnId]]" ng-checked="checked[l[columnId]]">
 
             <!--COLUMN-->
-            <span ng-if="c.type==undefined && !c.html" ng-class="c.tdTextClass"
+            <span ng-if="c.type==undefined && !c.html && verifyIf(c, l)" ng-class="c.tdTextClass"
                   ng-style="c.tdTextStyle">{{getTdColumn(l, c)}}</span>
                   
-           <span ng-if="c.type==undefined && c.html" ng-class="c.tdTextClass"
-                  ng-style="c.tdTextStyle" ng-bind-html="getTdColumn(l, c) | renderHtml"></span> 
+           <span ng-if="c.type==undefined && c.html && verifyIf(c, l)" ng-class="c.tdTextClass"
+                  ng-style="c.tdTextStyle" ng-bind-html="getTdColumn(l, c) | renderHtml"></span>
            <!--COLUMN-->      
 
             <!--ACTION-->
-            <a ng-if="c.type=='action' && verifyActionIf(c, l)" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)"
+            <a ng-if="c.type=='action' && verifyIf(c, l)" type="button" ng-click="c.url ? redirecionar(c.url, l) : c.action(l)"
                class="btn {{c.buttonClass}}"><i class="{{c.buttonIcon}}"></i>{{c.label}}</a>
         </td>
         <!-- CONTENT-->
@@ -140,17 +141,17 @@
                     <td width="2%"></td>
                     <td align="{{tv.tdAlign}}" ng-repeat="tv in toggleColumns track by $index">
                         <!-- CHECKBOX-->
-                        <input ng-if="tv.type=='checkbox'" type="checkbox"
+                        <input ng-if="tv.type=='checkbox' &&  verifyIf(tv, v)" type="checkbox"
                                ng-click="tv.action({elemento:v, status:selecionados[v[toggleColumnId]]}); setSelected(v, selecionados[v[toggleColumnId]], toggleColumnId)"
                                ng-model="selecionados[v[toggleColumnId]]" ng-checked="checked[v[toggleColumnId]]">
 
                         <!-- COLUMN-->
-                        <span ng-if="tv.type==undefined && !c.html" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle">{{getTdColumn(v, tv)}}</span>
-                        <span ng-if="tv.type==undefined && c.html" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle"  ng-bind-html="getTdColumn(v, tv) | renderHtml"></span>
+                        <span ng-if="tv.type==undefined && !c.html &&  verifyIf(tv, v)" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle">{{getTdColumn(v, tv)}}</span>
+                        <span ng-if="tv.type==undefined && c.html &&  verifyIf(tv, v)" ng-class="tv.tdTextClass" ng-style="tv.tdTextStyle"  ng-bind-html="getTdColumn(v, tv) | renderHtml"></span>
                         <!-- COLUMN-->
 
                         <!--ACTION-->
-                        <a ng-if="tv.type=='action' &&  verifyActionIf(tv, v)" type="button"
+                        <a ng-if="tv.type=='action' &&  verifyIf(tv, v)" type="button"
                            ng-click="tv.url ? redirecionar(tv.url, v) : tv.action({elemento: v})"
                            class="btn {{tv.buttonClass}}">{{tv.label}}</a>
                     </td>

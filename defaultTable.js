@@ -1,13 +1,12 @@
 angular.module('defaultTable', []);
 
-angular.module('defaultTable').filter('renderHtml', function($sce) {
+angular.module('defaultTable').filter('renderHtml', function ($sce) {
 
-	  
-	return function(stringToParse)
-	{
-		console.log(stringToParse);
-		return $sce.trustAsHtml(stringToParse);
-	}
+
+    return function (stringToParse) {
+        console.log(stringToParse);
+        return $sce.trustAsHtml(stringToParse);
+    }
 
 });
 
@@ -70,6 +69,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             filterAjax: '=defaultTableAjax',
             onlySelectedCheck: '=?defaultTableOnlySelected',
             onlySelectedLabel: '@defaultTableOnlySelectedLabel',
+            checkAction: '&?defaultTableColumnCheckAction',
             columnId: '@defaultTableColumnId',
             buttonActions: '=defaultTableButtonActions',
             buttonActionsLabel: '@defaultTableButtonActionsLabel',
@@ -162,7 +162,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             }
 
             function customChangeStatus(selected, customMethodAction) {
-                if(selected.length > 0){
+                if (selected.length > 0) {
                     $http({
                         async: false,
                         method: 'POST',
@@ -208,7 +208,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     fixedSearchParams: searchParams,
                     limit: limit,
                     offset: offset,
-					onlySelected: oselected ? checkedValues : [],
+                    onlySelected: oselected ? checkedValues : [],
                 };
 
                 if (angular.isDefined(scope.customFilterMethod)) {
@@ -277,11 +277,9 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                         v = v[column.id] ? v[column.id] : "";
 
 
-
-
                     if (column.expression) {
                         value = eval(column.expression.replace("{value}", v));
-                    } else if(column.html) {
+                    } else if (column.html) {
                         value = column.html.replace("{value}", v);
                     } else if (v)
                         value = v;
@@ -315,7 +313,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             scope.redirecionar = function (url, value = null) {
 
                 var parameters = url.match(/{[A-za-z]+}/);
-               
+
                 if (parameters && value) {
                     angular.forEach(parameters, function (p) {
                         id = p.replace("{", "").replace("}", "");
@@ -351,15 +349,19 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 }
             }
 
-            scope.verifyActionIf = function(c, elemento){
-                if(c.if){
-                    var expression = c.if;
+            scope.verifyIf = function (c, elemento) {
+                var nivelIf = c.ifColumn ? "ifColumn" : "if";
+
+                if (c[nivelIf]) {
+                    var expression = c[nivelIf];
                     var exp = expression.match(/{(.|\n)*?}/g);
 
-                    angular.forEach(exp, function(e){
-                        var column = e.replace("{").replace("}");
-                        expression = expression.replace(e, elemento[column]);
-                    });
+                    if (exp && exp.length > 0) {
+                        angular.forEach(exp, function (e) {
+                            var column = e.replace("{").replace("}");
+                            expression = expression.replace(e, elemento[column]);
+                        });
+                    }
 
                     return eval(expression);
                 }
@@ -408,7 +410,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
                             var columnId = scope.columnId;
 
-                            if(typeof value == 'object') {
+                            if (typeof value == 'object') {
                                 if (e[columnId] == value[columnId])
                                     return true;
                             } else {
@@ -424,7 +426,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             };
 
             function refreshTable(data) {
-                if (data) {
+                if (data != undefined) {
                     scope.listData = data;
                     scope.list = data;
                 } else
@@ -438,15 +440,28 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 scope.list.push(elemento);
             };
 
+            function getSelected() {
+                return scope.selected;
+            }
+
             function setFixedParamns(fixedParams) {
                 scope.fixedSearchParams = fixedParams;
             }
+
+            function cleanChecked() {
+                checkedValues = [];
+                scope.selected = {};
+                scope.checked = {};
+            }
+
 
             if (scope.acess) {
                 scope.acess.setChecked = setChecked;
                 scope.acess.refreshTable = refreshTable;
                 scope.acess.addNewLine = addNewLine;
                 scope.acess.setFixedParamns = setFixedParamns;
+                scope.acess.cleanChecked = cleanChecked;
+                scope.acess.getSelected = getSelected;
             }
 
             if (scope.checkedValues && scope.checkedValues.length > 0)
