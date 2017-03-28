@@ -10,6 +10,10 @@ angular.module('defaultTable').filter('renderHtml', function ($sce) {
 
 });
 
+angular.module("defaultTable").config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.headers.common['X-CSRF-TOKEN'] =     $('meta[name="csrf-token"]').attr('content')
+}]);
+
 angular.module('defaultTable').provider('defaultTableConfig', function ($interpolateProvider) {
 
     var options = {
@@ -50,7 +54,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             columnsAlign: '@defaultTableColumnColumnsAlign',
             fixedSearchParams: '=defaultTableFixedSearchParams',
             relations: '=defaultTableRelations',
-            token: '@defaultTableToken',
             checkedValues: '=defaultTableCheckedValues',
             trStyle: '=defaultTableTrStyle',
             trActionMethod: '&?defaultTableTrAction',
@@ -79,7 +82,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
         },
         link: function (scope, element, attrs, ctrl) {
 
-            var token = scope.token;
             var urlList = scope.urlList;
             var urlFilter = scope.customFilterUrl ? scope.customFilterUrl : "/filter-data-table";
 
@@ -166,7 +168,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                     $http({
                         async: false,
                         method: 'POST',
-                        data: {selected: selected, _token: token, customMethodAction: customMethodAction},
+                        data: {selected: selected, customMethodAction: customMethodAction},
                         url: urlList + "/change-status-all",
                     }).then(function successCallback(response) {
                         var orderBy = scope.orderBy;
@@ -202,7 +204,6 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 var data = {
                     orderByTarget: orderByTarget,
                     orderBy: orderBy,
-                    _token: token,
                     modelFilter: modelFilter,
                     relations: relations,
                     fixedSearchParams: searchParams,
@@ -412,14 +413,13 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
                             if (typeof value == 'object') {
                                 if (e[columnId] == value[columnId])
-                                    return true;
+                                    scope.selected.push(e);
                             } else {
                                 if (e[columnId] == value)
-                                    return true;
+                                    scope.selected.push(e);
                             }
                         });
 
-                        scope.selected.push(v[0]);
                     });
                 }
 
