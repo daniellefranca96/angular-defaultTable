@@ -62,6 +62,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             orderByTarget: '@defaultTableOrderBy',
             toggle: '@defaultTableToggle',
             toggleId: '@defaultTableToggleId',
+            toggleValuesId: '@defaultTableToggleValuesId',
             toggleColumns: '=defaultTableToggleColumns',
             toggleIconExpand: '@defaultTableToggleIconExpand',
             toggleIconCollapse: '@defaultTableToggleIconCollapse',

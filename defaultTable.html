@@ -95,13 +95,13 @@
 
         <!--TOGGLE-->
         <th ng-if="toggle">
-            <span ng-click="toggleClick[l[columnId]] = !toggleClick[l[columnId]]"
-                  class="{{toggleClick[l[columnId]] ? toggleIconCollapse : toggleIconExpand}}"></span>
+            <span ng-click="toggleClick[l[toggleId]] = !toggleClick[l[toggleId]]"
+                  class="{{toggleClick[l[toggleId]] ? toggleIconCollapse : toggleIconExpand}}"></span>
         </th>
         <!--TOGGLE-->
 
         <!-- CONTENT-->
-        <td align="{{c.tdAlign}}" ng-repeat="c in columns" ng-init="toggleClick[l[columnId]] = false">
+        <td align="{{c.tdAlign}}" ng-repeat="c in columns">
 
             <!-- CHECKBOX-->
             <input ng-if="c.type=='checkbox' && verifyIf(c, l)" type="checkbox"
@@ -123,7 +123,7 @@
         <!-- CONTENT-->
 
     </tr>
-    <tr ng-repeat-end ng-show="toggleClick[l[columnId]]">
+    <tr ng-repeat-end ng-show="toggleClick[l[toggleId]]">
         <!-- TOOGLE COLUMNS-->
         <td colspan="{{getColumnsTotal()}}">
             <table class="table table-bordered table-hover">
@@ -137,7 +137,7 @@
                 <!--HEADER-->
 
                 <!-- COLUMNS-->
-                <tr ng-repeat="v in l[toggleId]">
+                <tr ng-repeat="v in l[toggleValuesId]">
                     <td width="2%"></td>
                     <td align="{{tv.tdAlign}}" ng-repeat="tv in toggleColumns track by $index">
                         <!-- CHECKBOX-->
