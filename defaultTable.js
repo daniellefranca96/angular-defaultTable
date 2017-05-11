@@ -312,7 +312,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 return columns + toogle;
             }
 
-            scope.redirecionar = function (url, value = null) {
+            scope.redirecionar = function (url, value) {
 
                 var parameters = url.match(/{[A-za-z]+}/);
 
@@ -328,7 +328,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
             };
 
             scope.getFilters = function (columns, filterAjax) {
-                filters = {};
+                var filters = {};
 
                 if (columns.length > 0 && !filterAjax) {
                     angular.forEach(columns, function (c) {
