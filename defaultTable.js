@@ -12,6 +12,7 @@ angular.module('defaultTable').filter('renderHtml', function ($sce) {
 
 angular.module("defaultTable").config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.headers.common['X-CSRF-TOKEN'] =     $('meta[name="csrf-token"]').attr('content')
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 }]);
 
 angular.module('defaultTable').provider('defaultTableConfig', function ($interpolateProvider) {
@@ -230,7 +231,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                             scope.list = response.data.data;
                             setChecked(checkedValues);
                             scope.total = response.data.total;
-                        }
+                        }                         
 
                     }, function errorCallback(response) {
                         console.log(response.error);
@@ -312,7 +313,7 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
                 return columns + toogle;
             }
 
-            scope.redirecionar = function (url, value) {
+            scope.redirecionar = function (url, value ) {
 
                 var parameters = url.match(/{[A-za-z]+}/);
 
@@ -451,8 +452,8 @@ angular.module('defaultTable').directive('defaultTable', function ($filter, $htt
 
             function cleanChecked() {
                 checkedValues = [];
-                scope.selected = {};
-                scope.checked = {};
+                scope.selected = [];
+                scope.checked = [];
             }
 
 
