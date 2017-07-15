@@ -177,7 +177,7 @@ The attribute `default-table-custom-filter-method` receives a custom filter func
 
 **Filter Object**<br/>
 The object send in the ajax request or in the custom method:
-````
+```
 var data = {
             orderByTarget: orderByTarget,
             orderBy: orderBy,
